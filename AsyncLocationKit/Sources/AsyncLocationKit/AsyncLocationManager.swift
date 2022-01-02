@@ -9,6 +9,9 @@ public typealias LocationStream = AsyncStream<[CLLocation]>
 
 public final class AsyncLocationManager {
     public init() { }
+    
+    func setup() {
+    }
 }
 
 #endif
