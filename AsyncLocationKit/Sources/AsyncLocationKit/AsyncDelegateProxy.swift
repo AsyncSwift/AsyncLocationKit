@@ -1,6 +1,27 @@
 import Foundation
 
 protocol Cancellabel: AnyObject {
+    /// # Performer can use CheckecContinuation
+    /// # who can return value only **once**, and next attempt will lead to **crash** application
+    /// ```swift
+    /// class SomePerformer: AnyLocationPerformer {
+    ///     weak var cancellabel: Cancellabel?
+    ///
+    ///    func invokedMethod(event: **SomeEvent**) {
+    ///         switch event {
+    ///         case .didChangeAuthorization(let status):
+    ///             if status != .notDetermined {
+    ///                 guard let continuation = continuation else { cancellabel?.cancel(for: self); return }
+    ///                 continuation.resume(returning: status)
+    ///                 self.continuation = nil
+    ///                 cancellabel?.cancel(for: self)
+    ///             }
+    ///         /* other cases c*/
+    ///    }
+    ///     // implementation other protocol methods
+    /// }
+    /// ```
+    ///
     func cancel(for performer: AnyLocationPerformer)
 }
 
@@ -14,8 +35,11 @@ protocol AsyncDelegateProxyInterface: AnyObject {
 
 final class AsyncDelegateProxy: AsyncDelegateProxyInterface {
     
+    /// Array of performers, who handle events from normal delegate
     var performers: [AnyLocationPerformer] = []
     
+    /// Handle method from delegate converted to **enum** case
+    /// - Parameter event: case converting from method of normal delegate
     func eventForMethodInvoked(_ event: CoreLocationDelegateEvent) {
         for performer in performers {
             if performer.eventSupported(event) {

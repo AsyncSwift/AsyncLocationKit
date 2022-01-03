@@ -1,6 +1,11 @@
 import Foundation
+import CoreLocation.CLLocation
 
-#if swift(>=5.5)
+public enum LocationUpdateEvent {
+    case didPaused
+    case didResume
+    case didUpdateLocations(locations: [CLLocation])
+}
 
 class RequestAuthorizationPerformer: AnyLocationPerformer {
     
@@ -41,5 +46,3 @@ class RequestAuthorizationPerformer: AnyLocationPerformer {
     func cancelation() { }
     
 }
-
-#endif
