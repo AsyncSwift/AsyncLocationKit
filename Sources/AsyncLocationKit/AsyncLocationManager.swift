@@ -7,6 +7,7 @@ public typealias LocationStream = AsyncStream<LocationUpdateEvent>
 public typealias RegionMonitoringStream = AsyncStream<RegionMonitoringEvent>
 public typealias VisitMonitoringStream = AsyncStream<VisitMonitoringEvent>
 public typealias HeadingMonitorStream = AsyncStream<HeadingMonitorEvent>
+public typealias BeaconsRangingStream = AsyncStream<BeaconRangeEvent>
 
 public final class AsyncLocationManager: NSObject {
     
@@ -51,6 +52,7 @@ public final class AsyncLocationManager: NSObject {
     public func startUpdatingLocation() async -> LocationStream {
         let monitoringPerformer = MonitoringUpdateLocationPerformer()
         return LocationStream { streamContinuation in
+            monitoringPerformer.linkContinuation(streamContinuation)
             proxyDelegate.addPerformer(monitoringPerformer)
             locationManager.startUpdatingLocation()
             streamContinuation.onTermination = { @Sendable _ in
@@ -99,6 +101,7 @@ public final class AsyncLocationManager: NSObject {
     public func startMonitoringVisit() async -> VisitMonitoringStream {
         let performer = VisitMonitoringPerformer()
         return VisitMonitoringStream { stream in
+            performer.linkContinuation(stream)
             proxyDelegate.addPerformer(performer)
             locationManager.startMonitoringVisits()
             stream.onTermination = { @Sendable _ in
@@ -115,6 +118,7 @@ public final class AsyncLocationManager: NSObject {
     public func startUpdatingHeading() async -> HeadingMonitorStream {
         let performer = HeadingMonitorPerformer()
         return HeadingMonitorStream { stream in
+            performer.linkContinuation(stream)
             proxyDelegate.addPerformer(performer)
             locationManager.startUpdatingHeading()
             stream.onTermination = { @Sendable _ in
@@ -128,11 +132,23 @@ public final class AsyncLocationManager: NSObject {
         locationManager.stopUpdatingHeading()
     }
     
-    public func startRangingBeacons(satisfying: CLBeaconIdentityConstraint) {
-        locationManager.startRangingBeacons(satisfying: satisfying)
+    public func startRangingBeacons(satisfying: CLBeaconIdentityConstraint) async -> BeaconsRangingStream {
+        let performer = BeaconsRangePerformer(satisfying: satisfying)
+        return BeaconsRangingStream { stream in
+            performer.linkContinuation(stream)
+            proxyDelegate.addPerformer(performer)
+            locationManager.startRangingBeacons(satisfying: satisfying)
+            stream.onTermination = { @Sendable _ in
+                self.stopRangingBeacons(satisfying: satisfying)
+            }
+        }
     }
     
     public func stopRangingBeacons(satisfying: CLBeaconIdentityConstraint) {
+        proxyDelegate.cancel(for: BeaconsRangePerformer.self) { beaconsMonitoring in
+            guard let beaconsPerformer = beaconsMonitoring as? BeaconsRangePerformer else { return false }
+            return beaconsPerformer.satisfying == satisfying
+        }
         locationManager.stopRangingBeacons(satisfying: satisfying)
     }
     
