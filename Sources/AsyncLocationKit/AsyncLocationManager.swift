@@ -9,18 +9,17 @@ public typealias VisitMonitoringStream = AsyncStream<VisitMonitoringEvent>
 public typealias HeadingMonitorStream = AsyncStream<HeadingMonitorEvent>
 public typealias BeaconsRangingStream = AsyncStream<BeaconRangeEvent>
 
-public final class AsyncLocationManager: NSObject {
+public final class AsyncLocationManager {
     
     public private(set) var locationManager: CLLocationManager
     private var proxyDelegate: AsyncDelegateProxyInterface
     private var locationDelegate: CLLocationManagerDelegate
     
-    public override init() {
+    public init() {
         locationManager = CLLocationManager()
         proxyDelegate = AsyncDelegateProxy()
         locationDelegate = LocationDelegate(delegateProxy: proxyDelegate)
         locationManager.delegate = locationDelegate
-        super.init()
     }
     
     public func requestAuthorizationWhenInUse() async -> CLAuthorizationStatus {
