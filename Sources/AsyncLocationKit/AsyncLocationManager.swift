@@ -4,6 +4,9 @@ import CoreLocation
 public typealias AuthotizationContinuation = CheckedContinuation<CLAuthorizationStatus, Never>
 public typealias LocationOnceContinuation = CheckedContinuation<LocationUpdateEvent?, Error>
 public typealias LocationStream = AsyncStream<LocationUpdateEvent>
+public typealias RegionMonitoringStream = AsyncStream<RegionMonitoringEvent>
+public typealias VisitMonitoringStream = AsyncStream<VisitMonitoringEvent>
+public typealias HeadingMonitorStream = AsyncStream<HeadingMonitorEvent>
 
 public final class AsyncLocationManager: NSObject {
     
@@ -74,27 +77,54 @@ public final class AsyncLocationManager: NSObject {
         })
     }
     
-    public func startMonitoring(for region: CLRegion) {
-        locationManager.startMonitoring(for: region)
+    public func startMonitoring(for region: CLRegion) async -> RegionMonitoringStream {
+        let performer = RegionMonitoringPerformer(region: region)
+        return RegionMonitoringStream { streamContinuation in
+            performer.linkContinuation(streamContinuation)
+            locationManager.startMonitoring(for: region)
+            streamContinuation.onTermination = { @Sendable _ in
+                self.proxyDelegate.cancel(for: performer.uniqueIdentifier)
+            }
+        }
     }
     
     public func stopMonitoring(for region: CLRegion) {
+        proxyDelegate.cancel(for: RegionMonitoringPerformer.self) { regionMonitoring in
+            guard let regionPerformer = regionMonitoring as? RegionMonitoringPerformer else { return false }
+            return regionPerformer.region ==  region
+        }
         locationManager.stopMonitoring(for: region)
     }
     
-    public func startMonitoringVisit() {
-        locationManager.startMonitoringVisits()
+    public func startMonitoringVisit() async -> VisitMonitoringStream {
+        let performer = VisitMonitoringPerformer()
+        return VisitMonitoringStream { stream in
+            proxyDelegate.addPerformer(performer)
+            locationManager.startMonitoringVisits()
+            stream.onTermination = { @Sendable _ in
+                self.stopMonitoringVisit()
+            }
+        }
     }
     
     public func stopMonitoringVisit() {
+        proxyDelegate.cancel(for: VisitMonitoringPerformer.self)
         locationManager.stopMonitoringVisits()
     }
     
-    public func startUpdatingHeading() {
-        locationManager.startUpdatingHeading()
+    public func startUpdatingHeading() async -> HeadingMonitorStream {
+        let performer = HeadingMonitorPerformer()
+        return HeadingMonitorStream { stream in
+            proxyDelegate.addPerformer(performer)
+            locationManager.startUpdatingHeading()
+            stream.onTermination = { @Sendable _ in
+                self.stopUpdatingHeading()
+            }
+        }
     }
     
     public func stopUpdatingHeading() {
+        proxyDelegate.cancel(for: HeadingMonitorPerformer.self)
         locationManager.stopUpdatingHeading()
     }
     

@@ -1,4 +1,11 @@
 import Foundation
+import CoreLocation.CLLocation
+
+public enum LocationUpdateEvent {
+    case didPaused
+    case didResume
+    case didUpdateLocations(locations: [CLLocation])
+}
 
 class MonitoringUpdateLocationPerformer: AnyLocationPerformer {
     
@@ -30,7 +37,7 @@ class MonitoringUpdateLocationPerformer: AnyLocationPerformer {
         case .locationUpdatesResume:
             stream?.yield(.didResume)
         default:
-            fatalError("Method can't be execute by this performer: \(String(describing: self))")
+            fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
         }
     }
     

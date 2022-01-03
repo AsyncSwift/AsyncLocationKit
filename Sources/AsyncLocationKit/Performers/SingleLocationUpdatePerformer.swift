@@ -33,7 +33,7 @@ class SingleLocationUpdatePerformer: AnyLocationPerformer {
             continuation = nil
             cancellabel?.cancel(for: self)
         default:
-            fatalError("Method can't be execute by this performer: \(String(describing: self))")
+            fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
         }
     }
     

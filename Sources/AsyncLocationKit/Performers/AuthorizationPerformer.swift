@@ -1,12 +1,6 @@
 import Foundation
 import CoreLocation.CLLocation
 
-public enum LocationUpdateEvent {
-    case didPaused
-    case didResume
-    case didUpdateLocations(locations: [CLLocation])
-}
-
 class RequestAuthorizationPerformer: AnyLocationPerformer {
     
     var typeIdentifier: ObjectIdentifier {
@@ -39,7 +33,7 @@ class RequestAuthorizationPerformer: AnyLocationPerformer {
                 cancellabel?.cancel(for: self)
             }
         default:
-            fatalError("Method can't be execute by this performer: \(String(describing: self))")
+            fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
         }
     }
     

@@ -51,7 +51,7 @@ enum CoreLocationDelegateEvent {
         case .didExitRegion(_):
             return .didExitRegion
         case .didStartMonitoringFor(_):
-            return .didStartMonitoringFor
+            return .didStartMonitoringForRegion
         case .didFailWithError(_):
             return .didFailWithError
         case .monitoringDidFailFor(_, _):
@@ -77,7 +77,7 @@ enum CoreLocationEventSupport {
     case didFailRanginForBeaconConstraint
     case didEnterRegion
     case didExitRegion
-    case didStartMonitoringFor
+    case didStartMonitoringForRegion
     case didFailWithError
     case monitoringDidFailForRegion
     case didVisit

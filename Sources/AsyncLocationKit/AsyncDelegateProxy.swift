@@ -1,5 +1,7 @@
 import Foundation
 
+typealias CancelationCondition = ((AnyLocationPerformer) -> Bool)
+
 protocol Cancellabel: AnyObject {
     /// # Performer can use CheckecContinuation
     /// # who can return value only **once**, and next attempt will lead to **crash** application
@@ -31,6 +33,7 @@ protocol AsyncDelegateProxyInterface: AnyObject {
     
     func cancel(for type: AnyLocationPerformer.Type)
     func cancel(for uniqueIdentifier: UUID)
+    func cancel(for type: AnyLocationPerformer.Type, with condition: @escaping CancelationCondition)
 }
 
 final class AsyncDelegateProxy: AsyncDelegateProxyInterface {
@@ -65,6 +68,14 @@ final class AsyncDelegateProxy: AsyncDelegateProxyInterface {
             } else {
                 return false
             }
+        }
+    }
+    
+    func cancel(for type: AnyLocationPerformer.Type, with condition: @escaping (AnyLocationPerformer) -> Bool) {
+        var filteredPerformer = performers.allWith(identifier: ObjectIdentifier(type))
+        filteredPerformer.removeAll(where: { condition($0) })
+        filteredPerformer.forEach { _performer in
+            performers.removeAll(where: { $0.uniqueIdentifier == _performer.uniqueIdentifier })
         }
     }
     
