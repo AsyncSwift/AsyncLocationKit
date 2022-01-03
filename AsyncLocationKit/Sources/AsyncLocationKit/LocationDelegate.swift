@@ -5,6 +5,11 @@ internal class LocationDelegate: NSObject, CLLocationManagerDelegate {
     
     weak var proxy: AsyncDelegateProxyInterface?
     
+    init(delegateProxy: AsyncDelegateProxyInterface) {
+        proxy = delegateProxy
+        super.init()
+    }
+    
 //    MARK: - Authorize
     @available(iOS 14, *)
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {

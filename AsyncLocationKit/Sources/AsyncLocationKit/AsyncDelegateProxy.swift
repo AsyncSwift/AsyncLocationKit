@@ -1,13 +1,7 @@
 import Foundation
 
-protocol AnyLocationPerformer: AnyObject {
-    
-    var identifier: ObjectIdentifier { get }
-    
-    func eventSupported(_ event: CoreLocationDelegateEvent) -> Bool
-    
-    func invokedMethod(event: CoreLocationDelegateEvent)
-    
+protocol Cancellabel: AnyObject {
+    func cancel(for performer: AnyLocationPerformer)
 }
 
 protocol AsyncDelegateProxyInterface: AnyObject {
@@ -15,6 +9,7 @@ protocol AsyncDelegateProxyInterface: AnyObject {
     func addPerformer(_ performer: AnyLocationPerformer)
     
     func cancel(for type: AnyLocationPerformer.Type)
+    func cancel(for uniqueIdentifier: UUID)
 }
 
 final class AsyncDelegateProxy: AsyncDelegateProxyInterface {
@@ -30,45 +25,29 @@ final class AsyncDelegateProxy: AsyncDelegateProxyInterface {
     }
     
     func addPerformer(_ performer: AnyLocationPerformer) {
-        if performers.contains(where: { $0.identifier == performer.identifier }) {
-            let actualPerformer = performers.with(identifier: performer.identifier)
-        }
+        performer.cancellabel = self
+        performers.append(performer)
     }
     
     func cancel(for type: AnyLocationPerformer.Type) {
-        performers.removeAll(where: { $0.identifier == ObjectIdentifier(type) })
+        performers.removeAll(where: { $0.typeIdentifier == ObjectIdentifier(type) })
     }
     
-}
-
-class RequestAuthorizationPerformer: AnyLocationPerformer {
-    
-    var identifier: ObjectIdentifier {
-        return ObjectIdentifier(Self.self)
-    }
-    
-    var eventsSupport: [CoreLocationEventSupport] = [.didChangeAuthorization]
-    
-    func eventSupported(_ event: CoreLocationDelegateEvent) -> Bool {
-        return eventsSupport.contains(event.rawEvent())
-    }
-    
-    func invokedMethod(event: CoreLocationDelegateEvent) {
-        switch event {
-        case .didChangeAuthorization(let status):
-            if status != .notDetermined {
-                
+    func cancel(for uniqueIdentifier: UUID) {
+        performers.removeAll { performer in
+            if performer.uniqueIdentifier == uniqueIdentifier {
+                performer.cancelation()
+                return true
+            } else {
+                return false
             }
-        default:
-            fatalError("Method can't be execute by this performer: \(String(describing: self))")
         }
     }
     
 }
 
-extension Array where Element == AnyLocationPerformer {
-    func with(identifier: ObjectIdentifier) -> Element {
-        guard let element = self.first(where: { $0.identifier == identifier }) else { fatalError("non elements in array with identifier: \(identifier)") }
-        return element
+extension AsyncDelegateProxy: Cancellabel {
+    func cancel(for performer: AnyLocationPerformer) {
+        performers.removeAll(where: { $0.uniqueIdentifier == performer.uniqueIdentifier })
     }
 }
