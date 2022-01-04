@@ -14,12 +14,19 @@ public final class AsyncLocationManager {
     public private(set) var locationManager: CLLocationManager
     private var proxyDelegate: AsyncDelegateProxyInterface
     private var locationDelegate: CLLocationManagerDelegate
+    private var desiredAccuracy: LocationAccuracy = .bestAccuracy
     
     public init() {
         locationManager = CLLocationManager()
         proxyDelegate = AsyncDelegateProxy()
         locationDelegate = LocationDelegate(delegateProxy: proxyDelegate)
         locationManager.delegate = locationDelegate
+        locationManager.desiredAccuracy = desiredAccuracy.convertingAccuracy
+    }
+    
+    public convenience init(desiredAccuracy: LocationAccuracy) {
+        self.init()
+        self.desiredAccuracy = desiredAccuracy
     }
     
     public func requestAuthorizationWhenInUse() async -> CLAuthorizationStatus {
