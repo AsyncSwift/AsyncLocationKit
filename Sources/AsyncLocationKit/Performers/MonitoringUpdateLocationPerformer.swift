@@ -5,6 +5,7 @@ public enum LocationUpdateEvent {
     case didPaused
     case didResume
     case didUpdateLocations(locations: [CLLocation])
+    case didFailWith(error: Error)
 }
 
 class MonitoringUpdateLocationPerformer: AnyLocationPerformer {
@@ -15,7 +16,7 @@ class MonitoringUpdateLocationPerformer: AnyLocationPerformer {
     
     var uniqueIdentifier: UUID = UUID()
     
-    var eventsSupport: [CoreLocationEventSupport] = [.didUpdateLocations, .locationUpdatesPaused, .locationUpdatesResume]
+    var eventsSupport: [CoreLocationEventSupport] = [.didUpdateLocations, .locationUpdatesPaused, .locationUpdatesResume, .didFailWithError]
     
     var cancellabel: Cancellabel?
     var stream: LocationStream.Continuation?
@@ -36,6 +37,8 @@ class MonitoringUpdateLocationPerformer: AnyLocationPerformer {
             stream?.yield(.didPaused)
         case .locationUpdatesResume:
             stream?.yield(.didResume)
+        case .didFailWithError(let error):
+            stream?.yield(.didFailWith(error: error))
         default:
             fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
         }
