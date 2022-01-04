@@ -11,7 +11,7 @@ public typealias BeaconsRangingStream = AsyncStream<BeaconRangeEvent>
 
 public final class AsyncLocationManager {
     
-    public private(set) var locationManager: CLLocationManager
+    private var locationManager: CLLocationManager
     private var proxyDelegate: AsyncDelegateProxyInterface
     private var locationDelegate: CLLocationManagerDelegate
     private var desiredAccuracy: LocationAccuracy = .bestAccuracy
