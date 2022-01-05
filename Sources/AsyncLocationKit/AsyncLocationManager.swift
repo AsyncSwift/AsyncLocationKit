@@ -35,9 +35,13 @@ public final class AsyncLocationManager {
             proxyDelegate.cancel(for: authorizationPerformer.uniqueIdentifier)
         } operation: {
             await withCheckedContinuation { continuation in
-                authorizationPerformer.linkContinuation(continuation)
-                proxyDelegate.addPerformer(authorizationPerformer)
-                locationManager.requestWhenInUseAuthorization()
+                if #available(iOS 14, *), locationManager.authorizationStatus != .notDetermined {
+                    continuation.resume(with: .success(locationManager.authorizationStatus))
+                } else {
+                    authorizationPerformer.linkContinuation(continuation)
+                    proxyDelegate.addPerformer(authorizationPerformer)
+                    locationManager.requestWhenInUseAuthorization()
+                }
             }
         }
     }
@@ -48,9 +52,13 @@ public final class AsyncLocationManager {
             proxyDelegate.cancel(for: authorizationPerformer.uniqueIdentifier)
         } operation: {
             await withCheckedContinuation { continuation in
-                authorizationPerformer.linkContinuation(continuation)
-                proxyDelegate.addPerformer(authorizationPerformer)
-                locationManager.requestAlwaysAuthorization()
+                if #available(iOS 14, *), locationManager.authorizationStatus != .notDetermined {
+                    continuation.resume(with: .success(locationManager.authorizationStatus))
+                } else {
+                    authorizationPerformer.linkContinuation(continuation)
+                    proxyDelegate.addPerformer(authorizationPerformer)
+                    locationManager.requestAlwaysAuthorization()
+                }
             }
         }
     }
