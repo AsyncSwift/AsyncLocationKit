@@ -35,8 +35,9 @@ public final class AsyncLocationManager {
             proxyDelegate.cancel(for: authorizationPerformer.uniqueIdentifier)
         } operation: {
             await withCheckedContinuation { continuation in
-                if #available(iOS 14, *), locationManager.authorizationStatus != .notDetermined {
-                    continuation.resume(with: .success(locationManager.authorizationStatus))
+                let authorizationStatus = checkingPermissions()
+                if authorizationStatus != .notDetermined {
+                    continuation.resume(with: .success(authorizationStatus))
                 } else {
                     authorizationPerformer.linkContinuation(continuation)
                     proxyDelegate.addPerformer(authorizationPerformer)
@@ -166,4 +167,15 @@ public final class AsyncLocationManager {
         locationManager.stopRangingBeacons(satisfying: satisfying)
     }
     
+}
+
+extension AsyncLocationManager {
+    /// Check if user already allowed location permission
+    private func checkingPermissions() -> CLAuthorizationStatus {
+        if #available(iOS 14, *) {
+            return locationManager.authorizationStatus
+        } else {
+            return CLLocationManager.authorizationStatus()
+        }
+    }
 }
