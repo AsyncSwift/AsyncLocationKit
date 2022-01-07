@@ -1,5 +1,9 @@
 # AsyncLocationKit
 
+[![Swift Package Manager](https://img.shields.io/badge/Swift_Package_Manager-compatible-orange?style=flat)](https://img.shields.io/badge/Swift_Package_Manager-compatible-orange?style=flat)
+[![Swift](https://img.shields.io/badge/Swift-5.5-orange?style=flat)](https://img.shields.io/badge/Swift-5.5-Orange?style=flat)
+[![Platforms](https://img.shields.io/badge/iOS-13-green?style=flat)](https://img.shields.io/badge/iOS-13-Orange?style=flat)
+
 Wrapper for Apple `CoreLocation` framework with new Concurency Model. No more `delegate` patter or `completion blocks`.
 
 ```swift
