@@ -5,7 +5,11 @@ import PackageDescription
 
 let package = Package(
     name: "AsyncLocationKit",
-    platforms: [.iOS("13.0")],
+    platforms: [
+        .iOS("13.0"),
+        .macOS(.v12)
+    ],
+    
     products: [
         .library(
             name: "AsyncLocationKit",
