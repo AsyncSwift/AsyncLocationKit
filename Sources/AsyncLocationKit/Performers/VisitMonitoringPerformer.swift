@@ -24,6 +24,7 @@ import Foundation
 import CoreLocation.CLVisit
 
 public enum VisitMonitoringEvent {
+    @available(watchOS, unavailable)
     case didVisit(visit: CLVisit)
     case didFailWithError(error: Error)
 }
@@ -53,7 +54,9 @@ class VisitMonitoringPerformer: AnyLocationPerformer {
         case .didFailWithError(let error):
             stream?.yield(.didFailWithError(error: error))
         case .didVisit(let visit):
+            #if os(iOS) || os(tvOS)
             stream?.yield(.didVisit(visit: visit))
+            #endif
         default:
             fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
         }
