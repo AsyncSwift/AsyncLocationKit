@@ -51,6 +51,10 @@ public final class AsyncLocationManager {
         self.desiredAccuracy = desiredAccuracy
     }
     
+    public func updateAccuracy(with newAccuracy: LocationAccuracy) {
+        locationManager.desiredAccuracy = newAccuracy.convertingAccuracy
+    }
+    
     public func requestAuthorizationWhenInUse() async -> CLAuthorizationStatus {
         let authorizationPerformer = RequestAuthorizationPerformer()
         return await withTaskCancellationHandler {
@@ -193,7 +197,6 @@ public final class AsyncLocationManager {
         }
         locationManager.stopRangingBeacons(satisfying: satisfying)
     }
-    
 }
 
 extension AsyncLocationManager {
