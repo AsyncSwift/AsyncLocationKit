@@ -6,6 +6,14 @@
 
 Wrapper for Apple `CoreLocation` framework with new Concurency Model. No more `delegate` pattern or `completion blocks`.
 
+#### Install
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/AsyncSwift/AsyncLocationKit.git", .upToNextMinor(from: "1.5.0"))
+]
+```
+
 ```swift
 import AsyncLocationKit
 
