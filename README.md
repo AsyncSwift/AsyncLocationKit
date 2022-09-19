@@ -16,7 +16,7 @@ dependencies: [
 ```
 
 
-:warning: **Initialize AsyncLocationManager only on synchronously MainThread**
+:warning: **Initialize AsyncLocationManager only synchronously on MainThread**
 
 ```swift
 import AsyncLocationKit
