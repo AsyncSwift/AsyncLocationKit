@@ -7,6 +7,7 @@
 Wrapper for Apple `CoreLocation` framework with new Concurency Model. No more `delegate` pattern or `completion blocks`.
 
 ### Install
+---
 ##### SPM
 ```swift
 dependencies: [
@@ -15,6 +16,7 @@ dependencies: [
 ```
 
 
+:warning: Initialize AsyncLocationManager only on synchronously MainThread 
 
 ```swift
 import AsyncLocationKit
