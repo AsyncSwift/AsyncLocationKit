@@ -59,7 +59,6 @@ protocol AsyncDelegateProxyInterface: AnyObject {
 }
 
 final class AsyncDelegateProxy: AsyncDelegateProxyInterface {
-    
     /// Array of performers, who handle events from normal delegate
     var performers: [AnyLocationPerformer] = []
     
@@ -100,7 +99,6 @@ final class AsyncDelegateProxy: AsyncDelegateProxyInterface {
             performers.removeAll(where: { $0.uniqueIdentifier == _performer.uniqueIdentifier })
         }
     }
-    
 }
 
 extension AsyncDelegateProxy: Cancellabel {

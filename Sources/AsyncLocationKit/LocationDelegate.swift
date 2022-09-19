@@ -24,7 +24,6 @@ import CoreLocation
 import Foundation
 
 internal class LocationDelegate: NSObject, CLLocationManagerDelegate {
-    
     weak var proxy: AsyncDelegateProxyInterface?
     
     init(delegateProxy: AsyncDelegateProxyInterface) {
@@ -64,7 +63,6 @@ internal class LocationDelegate: NSObject, CLLocationManagerDelegate {
         proxy?.eventForMethodInvoked(.didFailRanginFor(beaconConstraint: beaconConstraint, error: error))
     }
     
-    
 //    MARK: - Region
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
         proxy?.eventForMethodInvoked(.didEnterRegion(region: region))
@@ -77,7 +75,6 @@ internal class LocationDelegate: NSObject, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didStartMonitoringFor region: CLRegion) {
         proxy?.eventForMethodInvoked(.didStartMonitoringFor(region: region))
     }
-    
     
 //    MARK: - Fails methods
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
@@ -93,7 +90,6 @@ internal class LocationDelegate: NSObject, CLLocationManagerDelegate {
         proxy?.eventForMethodInvoked(.didVisit(visit: visit))
     }
     
-    
 //    MARK: - Pause and resume
     func locationManagerDidPauseLocationUpdates(_ manager: CLLocationManager) {
         proxy?.eventForMethodInvoked(.locationUpdatesPaused)
@@ -102,5 +98,4 @@ internal class LocationDelegate: NSObject, CLLocationManagerDelegate {
     func locationManagerDidResumeLocationUpdates(_ manager: CLLocationManager) {
         proxy?.eventForMethodInvoked(.locationUpdatesResume)
     }
-    
 }

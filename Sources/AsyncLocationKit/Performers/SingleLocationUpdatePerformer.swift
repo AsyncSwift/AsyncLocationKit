@@ -24,7 +24,6 @@ import Foundation
 import CoreLocation.CLLocation
 
 class SingleLocationUpdatePerformer: AnyLocationPerformer {
-    
     var typeIdentifier: ObjectIdentifier {
         return ObjectIdentifier(Self.self)
     }
@@ -60,5 +59,4 @@ class SingleLocationUpdatePerformer: AnyLocationPerformer {
     }
     
     func cancelation() { }
-
 }

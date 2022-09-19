@@ -48,5 +48,4 @@ public enum LocationAccuracy {
             return kCLLocationAccuracyBestForNavigation
         }
     }
-    
 }

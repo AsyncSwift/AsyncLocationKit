@@ -32,7 +32,6 @@ public typealias HeadingMonitorStream = AsyncStream<HeadingMonitorEvent>
 public typealias BeaconsRangingStream = AsyncStream<BeaconRangeEvent>
 
 public final class AsyncLocationManager {
-    
     private var locationManager: CLLocationManager
     private var proxyDelegate: AsyncDelegateProxyInterface
     private var locationDelegate: CLLocationManagerDelegate
@@ -157,7 +156,6 @@ public final class AsyncLocationManager {
     }
     
 #if os(iOS)
-    
     @available(iOS 13, *)
     public func startUpdatingHeading() async -> HeadingMonitorStream {
         let performer = HeadingMonitorPerformer()
@@ -175,7 +173,6 @@ public final class AsyncLocationManager {
         proxyDelegate.cancel(for: HeadingMonitorPerformer.self)
         locationManager.stopUpdatingHeading()
     }
-    
 #endif
     
     public func startRangingBeacons(satisfying: CLBeaconIdentityConstraint) async -> BeaconsRangingStream {

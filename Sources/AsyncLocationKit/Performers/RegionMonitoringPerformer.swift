@@ -31,7 +31,6 @@ public enum RegionMonitoringEvent {
 }
 
 class RegionMonitoringPerformer: AnyLocationPerformer {
-    
     var typeIdentifier: ObjectIdentifier {
         return ObjectIdentifier(Self.self)
     }
@@ -71,5 +70,4 @@ class RegionMonitoringPerformer: AnyLocationPerformer {
     }
     
     func cancelation() { }
-    
 }

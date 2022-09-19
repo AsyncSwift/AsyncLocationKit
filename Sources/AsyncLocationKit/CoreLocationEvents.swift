@@ -79,7 +79,6 @@ enum CoreLocationDelegateEvent {
             return .locationUpdatesResume
         }
     }
-    
 }
 
 /// Event for mark what support current delegate
