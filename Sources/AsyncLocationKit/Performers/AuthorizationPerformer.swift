@@ -24,7 +24,6 @@ import Foundation
 import CoreLocation.CLLocation
 
 class RequestAuthorizationPerformer: AnyLocationPerformer {
-    
     var typeIdentifier: ObjectIdentifier {
         return ObjectIdentifier(Self.self)
     }
@@ -60,5 +59,4 @@ class RequestAuthorizationPerformer: AnyLocationPerformer {
     }
     
     func cancelation() { }
-    
 }

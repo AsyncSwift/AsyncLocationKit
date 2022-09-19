@@ -66,6 +66,5 @@ class BeaconsRangePerformer: AnyLocationPerformer {
         }
     }
     
-    func cancelation() { }
-    
+    func cancelation() { }   
 }

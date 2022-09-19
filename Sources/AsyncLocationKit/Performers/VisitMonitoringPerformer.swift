@@ -29,7 +29,6 @@ public enum VisitMonitoringEvent {
 }
 
 class VisitMonitoringPerformer: AnyLocationPerformer {
-    
     var typeIdentifier: ObjectIdentifier {
         return ObjectIdentifier(Self.self)
     }
@@ -59,8 +58,5 @@ class VisitMonitoringPerformer: AnyLocationPerformer {
         }
     }
     
-    func cancelation() {
-    }
-    
-    
+    func cancelation() { }
 }

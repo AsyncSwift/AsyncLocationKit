@@ -31,7 +31,6 @@ public enum LocationUpdateEvent {
 }
 
 class MonitoringUpdateLocationPerformer: AnyLocationPerformer {
-    
     var typeIdentifier: ObjectIdentifier {
         return ObjectIdentifier(Self.self)
     }
@@ -71,5 +70,4 @@ class MonitoringUpdateLocationPerformer: AnyLocationPerformer {
         stream.finish()
         self.stream = nil
     }
-
 }

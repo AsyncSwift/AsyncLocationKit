@@ -29,7 +29,6 @@ public enum HeadingMonitorEvent {
 }
 
 class HeadingMonitorPerformer: AnyLocationPerformer {
-    
     var typeIdentifier: ObjectIdentifier {
         return ObjectIdentifier(Self.self)
     }
@@ -60,5 +59,4 @@ class HeadingMonitorPerformer: AnyLocationPerformer {
     }
     
     func cancelation() { }
-    
 }
