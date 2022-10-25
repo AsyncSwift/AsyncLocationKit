@@ -15,6 +15,11 @@ dependencies: [
 ]
 ```
 
+#### Cocoapods
+```
+pod 'AsyncLocationKit', :git => 'https://github.com/AsyncSwift/AsyncLocationKit.git', :tag => '1.5.2'
+```
+
 
 :warning: **Initialize AsyncLocationManager only synchronously on MainThread**
 
