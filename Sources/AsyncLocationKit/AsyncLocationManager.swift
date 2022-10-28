@@ -50,6 +50,14 @@ public final class AsyncLocationManager {
         self.desiredAccuracy = desiredAccuracy
     }
     
+    public func checkingPermissions() -> CLAuthorizationStatus {
+        if #available(iOS 14, *) {
+            return locationManager.authorizationStatus
+        } else {
+            return CLLocationManager.authorizationStatus()
+        }
+    }
+    
     public func updateAccuracy(with newAccuracy: LocationAccuracy) {
         locationManager.desiredAccuracy = newAccuracy.convertingAccuracy
     }
@@ -193,16 +201,5 @@ public final class AsyncLocationManager {
             return beaconsPerformer.satisfying == satisfying
         }
         locationManager.stopRangingBeacons(satisfying: satisfying)
-    }
-}
-
-extension AsyncLocationManager {
-    /// Check if user already allowed location permission
-    private func checkingPermissions() -> CLAuthorizationStatus {
-        if #available(iOS 14, *) {
-            return locationManager.authorizationStatus
-        } else {
-            return CLLocationManager.authorizationStatus()
-        }
     }
 }
