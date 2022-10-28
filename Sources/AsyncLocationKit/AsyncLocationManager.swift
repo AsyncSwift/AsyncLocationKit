@@ -50,7 +50,7 @@ public final class AsyncLocationManager {
         self.desiredAccuracy = desiredAccuracy
     }
     
-    public func checkingPermissions() -> CLAuthorizationStatus {
+    public func getAuthorizationStatus() -> CLAuthorizationStatus {
         if #available(iOS 14, *) {
             return locationManager.authorizationStatus
         } else {
@@ -68,7 +68,7 @@ public final class AsyncLocationManager {
             proxyDelegate.cancel(for: authorizationPerformer.uniqueIdentifier)
         } operation: {
             await withCheckedContinuation { continuation in
-                let authorizationStatus = checkingPermissions()
+                let authorizationStatus = getAuthorizationStatus()
                 if authorizationStatus != .notDetermined {
                     continuation.resume(with: .success(authorizationStatus))
                 } else {
