@@ -22,4 +22,4 @@
 
 import Foundation
 
-public let version: String = "1.0.5"
+public let version: String = "1.5.3"
