@@ -45,6 +45,14 @@ public final class AsyncLocationManager {
         locationManager.desiredAccuracy = desiredAccuracy.convertingAccuracy
     }
     
+    public init(locationManager: CLLocationManager, desiredAccuracy: LocationAccuracy) {
+        self.locationManager = locationManager
+        self.locationManager.delegate = locationDelegate
+        self.locationManager.desiredAccuracy = desiredAccuracy.convertingAccuracy
+        proxyDelegate = AsyncDelegateProxy()
+        locationDelegate = LocationDelegate(delegateProxy: proxyDelegate)
+    }
+    
     public convenience init(desiredAccuracy: LocationAccuracy) {
         self.init()
         self.desiredAccuracy = desiredAccuracy
@@ -62,6 +70,7 @@ public final class AsyncLocationManager {
         locationManager.desiredAccuracy = newAccuracy.convertingAccuracy
     }
     
+    @available(*, deprecated, message: "Use new function requestPermission(with:)")
     public func requestAuthorizationWhenInUse() async -> CLAuthorizationStatus {
         let authorizationPerformer = RequestAuthorizationPerformer()
         return await withTaskCancellationHandler {
@@ -80,6 +89,8 @@ public final class AsyncLocationManager {
         }
     }
     
+#if !APPCLIP
+    @available(*, deprecated, message: "Use new function requestPermission(with:)")
     public func requestAuthorizationAlways() async -> CLAuthorizationStatus {
         let authorizationPerformer = RequestAuthorizationPerformer()
         return await withTaskCancellationHandler {
@@ -94,6 +105,20 @@ public final class AsyncLocationManager {
                     locationManager.requestAlwaysAuthorization()
                 }
             }
+        }
+    }
+#endif
+    
+    public func requestPermission(with permissionType: LocationPermission) async -> CLAuthorizationStatus {
+        switch permissionType {
+        case .always:
+            #if APPCLIP
+            return await requestAuthorizationWhenInUse()
+            #else
+            return await requestAuthorizationAlways()
+            #endif
+        case .whenInUsage:
+            return await requestAuthorizationWhenInUse()
         }
     }
     
