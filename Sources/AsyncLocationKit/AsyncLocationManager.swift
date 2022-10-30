@@ -47,10 +47,10 @@ public final class AsyncLocationManager {
     
     public init(locationManager: CLLocationManager, desiredAccuracy: LocationAccuracy) {
         self.locationManager = locationManager
-        self.locationManager.delegate = locationDelegate
-        self.locationManager.desiredAccuracy = desiredAccuracy.convertingAccuracy
         proxyDelegate = AsyncDelegateProxy()
         locationDelegate = LocationDelegate(delegateProxy: proxyDelegate)
+        self.locationManager.delegate = locationDelegate
+        self.locationManager.desiredAccuracy = desiredAccuracy.convertingAccuracy
     }
     
     public convenience init(desiredAccuracy: LocationAccuracy) {
