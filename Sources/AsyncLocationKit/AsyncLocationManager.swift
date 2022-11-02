@@ -73,9 +73,7 @@ public final class AsyncLocationManager {
     @available(*, deprecated, message: "Use new function requestPermission(with:)")
     public func requestAuthorizationWhenInUse() async -> CLAuthorizationStatus {
         let authorizationPerformer = RequestAuthorizationPerformer()
-        return await withTaskCancellationHandler {
-            proxyDelegate.cancel(for: authorizationPerformer.uniqueIdentifier)
-        } operation: {
+        return await withTaskCancellationHandler(operation: {
             await withCheckedContinuation { continuation in
                 let authorizationStatus = getAuthorizationStatus()
                 if authorizationStatus != .notDetermined {
@@ -86,16 +84,16 @@ public final class AsyncLocationManager {
                     locationManager.requestWhenInUseAuthorization()
                 }
             }
-        }
+        }, onCancel: {
+            proxyDelegate.cancel(for: authorizationPerformer.uniqueIdentifier)
+        })
     }
     
 #if !APPCLIP
     @available(*, deprecated, message: "Use new function requestPermission(with:)")
     public func requestAuthorizationAlways() async -> CLAuthorizationStatus {
         let authorizationPerformer = RequestAuthorizationPerformer()
-        return await withTaskCancellationHandler {
-            proxyDelegate.cancel(for: authorizationPerformer.uniqueIdentifier)
-        } operation: {
+        return await withTaskCancellationHandler(operation: {
             await withCheckedContinuation { continuation in
                 if #available(iOS 14, *), locationManager.authorizationStatus != .notDetermined {
                     continuation.resume(with: .success(locationManager.authorizationStatus))
@@ -105,7 +103,9 @@ public final class AsyncLocationManager {
                     locationManager.requestAlwaysAuthorization()
                 }
             }
-        }
+        }, onCancel: {
+            proxyDelegate.cancel(for: authorizationPerformer.uniqueIdentifier)
+        })
     }
 #endif
     
@@ -113,12 +113,12 @@ public final class AsyncLocationManager {
         switch permissionType {
         case .always:
             #if APPCLIP
-            return await requestAuthorizationWhenInUse()
+            return await locationPermissionWhenInUse()
             #else
-            return await requestAuthorizationAlways()
+            return await locationPermissionAlways()
             #endif
         case .whenInUsage:
-            return await requestAuthorizationWhenInUse()
+            return await locationPermissionWhenInUse()
         }
     }
     
@@ -141,14 +141,14 @@ public final class AsyncLocationManager {
     
     public func requestLocation() async throws -> LocationUpdateEvent? {
         let performer = SingleLocationUpdatePerformer()
-        return try await withTaskCancellationHandler(handler: {
-            proxyDelegate.cancel(for: performer.uniqueIdentifier)
-        }, operation: {
+        return try await withTaskCancellationHandler(operation: {
             return try await withCheckedThrowingContinuation({ continuation in
                 performer.linkContinuation(continuation)
                 self.proxyDelegate.addPerformer(performer)
                 self.locationManager.requestLocation()
             })
+        }, onCancel: {
+            proxyDelegate.cancel(for: performer.uniqueIdentifier)
         })
     }
     
@@ -226,5 +226,42 @@ public final class AsyncLocationManager {
             return beaconsPerformer.satisfying == satisfying
         }
         locationManager.stopRangingBeacons(satisfying: satisfying)
+    }
+}
+
+extension AsyncLocationManager {
+    private func locationPermissionWhenInUse() async -> CLAuthorizationStatus {
+        let authorizationPerformer = RequestAuthorizationPerformer()
+        return await withTaskCancellationHandler(operation: {
+            await withCheckedContinuation { continuation in
+                let authorizationStatus = getAuthorizationStatus()
+                if authorizationStatus != .notDetermined {
+                    continuation.resume(with: .success(authorizationStatus))
+                } else {
+                    authorizationPerformer.linkContinuation(continuation)
+                    proxyDelegate.addPerformer(authorizationPerformer)
+                    locationManager.requestWhenInUseAuthorization()
+                }
+            }
+        }, onCancel: {
+            proxyDelegate.cancel(for: authorizationPerformer.uniqueIdentifier)
+        })
+    }
+    
+    private func locationPermissionAlways() async -> CLAuthorizationStatus {
+        let authorizationPerformer = RequestAuthorizationPerformer()
+        return await withTaskCancellationHandler(operation: {
+            await withCheckedContinuation { continuation in
+                if #available(iOS 14, *), locationManager.authorizationStatus != .notDetermined {
+                    continuation.resume(with: .success(locationManager.authorizationStatus))
+                } else {
+                    authorizationPerformer.linkContinuation(continuation)
+                    proxyDelegate.addPerformer(authorizationPerformer)
+                    locationManager.requestAlwaysAuthorization()
+                }
+            }
+        }, onCancel: {
+            proxyDelegate.cancel(for: authorizationPerformer.uniqueIdentifier)
+        })
     }
 }
