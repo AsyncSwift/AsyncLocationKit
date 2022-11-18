@@ -2,7 +2,7 @@
 
 [![Swift Package Manager](https://img.shields.io/badge/Swift_Package_Manager-compatible-orange?style=flat)](https://img.shields.io/badge/Swift_Package_Manager-compatible-orange?style=flat)
 [![Swift](https://img.shields.io/badge/Swift-5.5-orange?style=flat)](https://img.shields.io/badge/Swift-5.5-Orange?style=flat)
-[![Platforms](https://img.shields.io/badge/platforms-iOS--13%20|%20macOS(beta)-orange?style=flat)](https://img.shields.io/badge/platforms-iOS--13%20|%20macOS(beta)-orange?style=flat)
+[![Platforms](https://img.shields.io/badge/platforms-iOS--13%20|%20macOS(beta)%20|%20watchOS--6(beta)-orange?style=flat)](https://img.shields.io/badge/platforms-iOS--13%20|%20macOS(beta)-orange?style=flat)
 
 Wrapper for Apple `CoreLocation` framework with new Concurency Model. No more `delegate` pattern or `completion blocks`.
 
