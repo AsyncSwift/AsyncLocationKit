@@ -59,9 +59,9 @@ public final class AsyncLocationManager {
         self.desiredAccuracy = desiredAccuracy
     }
     
-    @available(watchOS 7.0, *)
+    @available(watchOS 6.0, *)
     public func getAuthorizationStatus() -> CLAuthorizationStatus {
-        if #available(iOS 14, *) {
+        if #available(iOS 14, watchOS 7, *) {
             return locationManager.authorizationStatus
         } else {
             return CLLocationManager.authorizationStatus()
@@ -264,7 +264,7 @@ extension AsyncLocationManager {
         let authorizationPerformer = RequestAuthorizationPerformer()
         return await withTaskCancellationHandler(operation: {
             await withCheckedContinuation { continuation in
-                if #available(iOS 14, *), locationManager.authorizationStatus != .notDetermined {
+                if #available(iOS 14, watchOS 7, *), locationManager.authorizationStatus != .notDetermined {
                     continuation.resume(with: .success(locationManager.authorizationStatus))
                 } else {
                     authorizationPerformer.linkContinuation(continuation)
