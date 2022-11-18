@@ -50,7 +50,7 @@ class SingleLocationUpdatePerformer: AnyLocationPerformer {
             continuation = nil
             cancellabel?.cancel(for: self)
         case .didFailWithError(let error):
-                continuation?.resume(returning: .didFailWith(error: error))
+            continuation?.resume(throwing: error)
             continuation = nil
             cancellabel?.cancel(for: self)
         default:
