@@ -29,6 +29,7 @@ public typealias LocationStream = AsyncStream<LocationUpdateEvent>
 public typealias RegionMonitoringStream = AsyncStream<RegionMonitoringEvent>
 public typealias VisitMonitoringStream = AsyncStream<VisitMonitoringEvent>
 public typealias HeadingMonitorStream = AsyncStream<HeadingMonitorEvent>
+@available(watchOS, unavailable)
 public typealias BeaconsRangingStream = AsyncStream<BeaconRangeEvent>
 
 public final class AsyncLocationManager {
@@ -58,6 +59,7 @@ public final class AsyncLocationManager {
         self.desiredAccuracy = desiredAccuracy
     }
     
+    @available(watchOS 7.0, *)
     public func getAuthorizationStatus() -> CLAuthorizationStatus {
         if #available(iOS 14, *) {
             return locationManager.authorizationStatus
@@ -71,6 +73,7 @@ public final class AsyncLocationManager {
     }
     
     @available(*, deprecated, message: "Use new function requestPermission(with:)")
+    @available(watchOS 7.0, *)
     public func requestAuthorizationWhenInUse() async -> CLAuthorizationStatus {
         let authorizationPerformer = RequestAuthorizationPerformer()
         return await withTaskCancellationHandler(operation: {
@@ -91,6 +94,8 @@ public final class AsyncLocationManager {
     
 #if !APPCLIP
     @available(*, deprecated, message: "Use new function requestPermission(with:)")
+    @available(watchOS 7.0, *)
+    @available(iOS 14, *)
     public func requestAuthorizationAlways() async -> CLAuthorizationStatus {
         let authorizationPerformer = RequestAuthorizationPerformer()
         return await withTaskCancellationHandler(operation: {
@@ -109,6 +114,7 @@ public final class AsyncLocationManager {
     }
 #endif
     
+    @available(watchOS 7.0, *)
     public func requestPermission(with permissionType: LocationPermission) async -> CLAuthorizationStatus {
         switch permissionType {
         case .always:
@@ -152,6 +158,7 @@ public final class AsyncLocationManager {
         })
     }
     
+    @available(watchOS, unavailable)
     public func startMonitoring(for region: CLRegion) async -> RegionMonitoringStream {
         let performer = RegionMonitoringPerformer(region: region)
         return RegionMonitoringStream { streamContinuation in
@@ -163,6 +170,7 @@ public final class AsyncLocationManager {
         }
     }
     
+    @available(watchOS, unavailable)
     public func stopMonitoring(for region: CLRegion) {
         proxyDelegate.cancel(for: RegionMonitoringPerformer.self) { regionMonitoring in
             guard let regionPerformer = regionMonitoring as? RegionMonitoringPerformer else { return false }
@@ -171,6 +179,7 @@ public final class AsyncLocationManager {
         locationManager.stopMonitoring(for: region)
     }
     
+    @available(watchOS, unavailable)
     public func startMonitoringVisit() async -> VisitMonitoringStream {
         let performer = VisitMonitoringPerformer()
         return VisitMonitoringStream { stream in
@@ -183,6 +192,7 @@ public final class AsyncLocationManager {
         }
     }
     
+    @available(watchOS, unavailable)
     public func stopMonitoringVisit() {
         proxyDelegate.cancel(for: VisitMonitoringPerformer.self)
         locationManager.stopMonitoringVisits()
@@ -208,6 +218,7 @@ public final class AsyncLocationManager {
     }
 #endif
     
+    @available(watchOS, unavailable)
     public func startRangingBeacons(satisfying: CLBeaconIdentityConstraint) async -> BeaconsRangingStream {
         let performer = BeaconsRangePerformer(satisfying: satisfying)
         return BeaconsRangingStream { stream in
@@ -220,6 +231,7 @@ public final class AsyncLocationManager {
         }
     }
     
+    @available(watchOS, unavailable)
     public func stopRangingBeacons(satisfying: CLBeaconIdentityConstraint) {
         proxyDelegate.cancel(for: BeaconsRangePerformer.self) { beaconsMonitoring in
             guard let beaconsPerformer = beaconsMonitoring as? BeaconsRangePerformer else { return false }
