@@ -35,6 +35,7 @@ internal class LocationDelegate: NSObject, CLLocationManagerDelegate {
     @available(iOS 14, *)
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         proxy?.eventForMethodInvoked(.didChangeAuthorization(status: manager.authorizationStatus))
+        proxy?.eventForMethodInvoked(.didChangeAccuracyAuthorization(authorization: manager.accuracyAuthorization))
     }
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {

@@ -24,11 +24,14 @@ import Foundation
 import CoreLocation
 
 public typealias AuthotizationContinuation = CheckedContinuation<CLAuthorizationStatus, Never>
+public typealias AccuracyAuthorizationContinuation = CheckedContinuation<CLAccuracyAuthorization?, Never>
 public typealias LocationOnceContinuation = CheckedContinuation<LocationUpdateEvent?, Error>
 public typealias LocationStream = AsyncStream<LocationUpdateEvent>
 public typealias RegionMonitoringStream = AsyncStream<RegionMonitoringEvent>
 public typealias VisitMonitoringStream = AsyncStream<VisitMonitoringEvent>
 public typealias HeadingMonitorStream = AsyncStream<HeadingMonitorEvent>
+public typealias AuthorizationStream = AsyncStream<AuthorizationEvent>
+public typealias AccuracyAuthorizationStream = AsyncStream<AccuracyAuthorizationEvent>
 public typealias BeaconsRangingStream = AsyncStream<BeaconRangeEvent>
 
 public final class AsyncLocationManager {
@@ -65,7 +68,42 @@ public final class AsyncLocationManager {
             return CLLocationManager.authorizationStatus()
         }
     }
-    
+
+    public func startMonitoringAuthorization() async -> AuthorizationStream {
+        let performer = AuthorizationMonitoringPerformer()
+        return AuthorizationStream { stream in
+            performer.linkContinuation(stream)
+            proxyDelegate.addPerformer(performer)
+            stream.onTermination = { @Sendable _ in
+                self.stopMonitoringAuthorization()
+            }
+        }
+    }
+
+    public func stopMonitoringAuthorization() {
+        proxyDelegate.cancel(for: AuthorizationMonitoringPerformer.self)
+    }
+
+    public func startMonitoringAccuracyAuthorization() async -> AccuracyAuthorizationStream {
+        let performer = AccuracyAuthorizationMonitoringPerformer()
+        return AccuracyAuthorizationStream { stream in
+            performer.linkContinuation(stream)
+            proxyDelegate.addPerformer(performer)
+            stream.onTermination = { @Sendable _ in
+                self.stopMonitoringAccuracyAuthorization()
+            }
+        }
+    }
+
+    public func stopMonitoringAccuracyAuthorization() {
+        proxyDelegate.cancel(for: AccuracyAuthorizationMonitoringPerformer.self)
+    }
+
+    @available(iOS 14, *)
+    public func getAccuracyAuthorization() -> CLAccuracyAuthorization {
+        locationManager.accuracyAuthorization
+    }
+
     public func updateAccuracy(with newAccuracy: LocationAccuracy) {
         locationManager.desiredAccuracy = newAccuracy.convertingAccuracy
     }
@@ -121,7 +159,12 @@ public final class AsyncLocationManager {
             return await locationPermissionWhenInUse()
         }
     }
-    
+
+    @available(iOS 14, *)
+    public func requestTemporaryFullAccuracyAuthorization(purposeKey: String) async -> CLAccuracyAuthorization? {
+        await locationPermissionTemporaryFullAccuracy(purposeKey: purposeKey)
+    }
+
     public func startUpdatingLocation() async -> LocationStream {
         let monitoringPerformer = MonitoringUpdateLocationPerformer()
         return LocationStream { streamContinuation in
@@ -258,6 +301,28 @@ extension AsyncLocationManager {
                     authorizationPerformer.linkContinuation(continuation)
                     proxyDelegate.addPerformer(authorizationPerformer)
                     locationManager.requestAlwaysAuthorization()
+                }
+            }
+        }, onCancel: {
+            proxyDelegate.cancel(for: authorizationPerformer.uniqueIdentifier)
+        })
+    }
+
+    @available(iOS 14, *)
+    private func locationPermissionTemporaryFullAccuracy(purposeKey: String) async -> CLAccuracyAuthorization? {
+        let authorizationPerformer = RequestAccuracyAuthorizationPerformer()
+        return await withTaskCancellationHandler(operation: {
+            await withCheckedContinuation { continuation in
+                if locationManager.authorizationStatus != .notDetermined && locationManager.accuracyAuthorization == .fullAccuracy {
+                    continuation.resume(with: .success(locationManager.accuracyAuthorization))
+                } else if locationManager.authorizationStatus == .notDetermined {
+                    continuation.resume(with: .success(nil))
+                } else if !CLLocationManager.locationServicesEnabled() {
+                    continuation.resume(with: .success(nil))
+                } else {
+                    authorizationPerformer.linkContinuation(continuation)
+                    proxyDelegate.addPerformer(authorizationPerformer)
+                    locationManager.requestTemporaryFullAccuracyAuthorization(withPurposeKey: purposeKey)
                 }
             }
         }, onCancel: {
