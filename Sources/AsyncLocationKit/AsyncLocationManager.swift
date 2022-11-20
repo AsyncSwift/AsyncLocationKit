@@ -157,7 +157,7 @@ public final class AsyncLocationManager {
         let authorizationPerformer = RequestAuthorizationPerformer()
         return await withTaskCancellationHandler(operation: {
             await withCheckedContinuation { continuation in
-                if #available(iOS 14, *), locationManager.authorizationStatus != .notDetermined {
+                if #available(iOS 14, *), locationManager.authorizationStatus != .notDetermined && locationManager.authorizationStatus != .authorizedWhenInUse {
                     continuation.resume(with: .success(locationManager.authorizationStatus))
                 } else {
                     authorizationPerformer.linkContinuation(continuation)
@@ -319,7 +319,7 @@ extension AsyncLocationManager {
         let authorizationPerformer = RequestAuthorizationPerformer()
         return await withTaskCancellationHandler(operation: {
             await withCheckedContinuation { continuation in
-                if #available(iOS 14, *), locationManager.authorizationStatus != .notDetermined {
+                if #available(iOS 14, *), locationManager.authorizationStatus != .notDetermined && locationManager.authorizationStatus != .authorizedWhenInUse {
                     continuation.resume(with: .success(locationManager.authorizationStatus))
                 } else {
                     authorizationPerformer.linkContinuation(continuation)
