@@ -26,6 +26,7 @@ import CoreLocation
 public typealias AuthotizationContinuation = CheckedContinuation<CLAuthorizationStatus, Never>
 public typealias AccuracyAuthorizationContinuation = CheckedContinuation<CLAccuracyAuthorization?, Never>
 public typealias LocationOnceContinuation = CheckedContinuation<LocationUpdateEvent?, Error>
+public typealias LocationEnabledStream = AsyncStream<LocationEnabledEvent>
 public typealias LocationStream = AsyncStream<LocationUpdateEvent>
 public typealias RegionMonitoringStream = AsyncStream<RegionMonitoringEvent>
 public typealias VisitMonitoringStream = AsyncStream<VisitMonitoringEvent>
@@ -60,13 +61,36 @@ public final class AsyncLocationManager {
         self.init()
         self.desiredAccuracy = desiredAccuracy
     }
-    
+
+    public func getLocationEnabled() async -> Bool {
+        // Though undocumented, `locationServicesEnabled()` must not be called from the main thread. Otherwise,
+        // we get a runtime warning "This method can cause UI unresponsiveness if invoked on the main thread"
+        // Therefore, we use `Task.detached` to ensure we're off the main thread.
+        // Also, we force `try` as we expect no exceptions to be thrown from `locationServicesEnabled()`
+        try! await Task.detached { CLLocationManager.locationServicesEnabled() }.value
+    }
+
     public func getAuthorizationStatus() -> CLAuthorizationStatus {
         if #available(iOS 14, *) {
             return locationManager.authorizationStatus
         } else {
             return CLLocationManager.authorizationStatus()
         }
+    }
+
+    public func startMonitoringLocationEnabled() async -> LocationEnabledStream {
+        let performer = LocationEnabledMonitoringPerformer()
+        return LocationEnabledStream { stream in
+            performer.linkContinuation(stream)
+            proxyDelegate.addPerformer(performer)
+            stream.onTermination = { @Sendable _ in
+                self.stopMonitoringLocationEnabled()
+            }
+        }
+    }
+
+    public func stopMonitoringLocationEnabled() {
+        proxyDelegate.cancel(for: LocationEnabledMonitoringPerformer.self)
     }
 
     public func startMonitoringAuthorization() async -> AuthorizationStream {

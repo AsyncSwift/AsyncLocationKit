@@ -36,12 +36,23 @@ internal class LocationDelegate: NSObject, CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         proxy?.eventForMethodInvoked(.didChangeAuthorization(status: manager.authorizationStatus))
         proxy?.eventForMethodInvoked(.didChangeAccuracyAuthorization(authorization: manager.accuracyAuthorization))
+        locationServicesEnabledDidChange()
     }
-    
+
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         proxy?.eventForMethodInvoked(.didChangeAuthorization(status: status))
+        locationServicesEnabledDidChange()
     }
-    
+
+    private func locationServicesEnabledDidChange() {
+        Task {
+            let enabled = CLLocationManager.locationServicesEnabled()
+            await MainActor.run {
+                proxy?.eventForMethodInvoked(.didChangeLocationEnabled(enabled: enabled))
+            }
+        }
+    }
+
 //    MARK: - Stream new event with locations/heading/region
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         proxy?.eventForMethodInvoked(.didUpdate(locations: locations))
