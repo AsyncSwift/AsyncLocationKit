@@ -36,16 +36,17 @@ public final class AsyncLocationManager {
     private var proxyDelegate: AsyncDelegateProxyInterface
     private var locationDelegate: CLLocationManagerDelegate
     
-    public convenience init(desiredAccuracy: LocationAccuracy = .bestAccuracy) {
+    public convenience init(desiredAccuracy: LocationAccuracy = .bestAccuracy, allowsBackgroundLocationUpdates: Bool = false) {
         self.init(locationManager: CLLocationManager(), desiredAccuracy: desiredAccuracy)
     }
 
-    public init(locationManager: CLLocationManager, desiredAccuracy: LocationAccuracy = .bestAccuracy) {
+    public init(locationManager: CLLocationManager, desiredAccuracy: LocationAccuracy = .bestAccuracy, allowsBackgroundLocationUpdates: Bool = false) {
         self.locationManager = locationManager
         proxyDelegate = AsyncDelegateProxy()
         locationDelegate = LocationDelegate(delegateProxy: proxyDelegate)
         self.locationManager.delegate = locationDelegate
         self.locationManager.desiredAccuracy = desiredAccuracy.convertingAccuracy
+        self.locationManager.allowsBackgroundLocationUpdates = allowsBackgroundLocationUpdates
     }
     
     
@@ -60,7 +61,11 @@ public final class AsyncLocationManager {
     public func updateAccuracy(with newAccuracy: LocationAccuracy) {
         locationManager.desiredAccuracy = newAccuracy.convertingAccuracy
     }
-    
+
+    public func updateAllowsBackgroundLocationUpdates(with newAllows: Bool) {
+        locationManager.allowsBackgroundLocationUpdates = newAllows
+    }
+
     @available(*, deprecated, message: "Use new function requestPermission(with:)")
     public func requestAuthorizationWhenInUse() async -> CLAuthorizationStatus {
         let authorizationPerformer = RequestAuthorizationPerformer()
