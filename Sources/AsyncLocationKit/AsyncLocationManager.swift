@@ -36,17 +36,12 @@ public final class AsyncLocationManager {
     private var locationManager: CLLocationManager
     private var proxyDelegate: AsyncDelegateProxyInterface
     private var locationDelegate: CLLocationManagerDelegate
-    private var desiredAccuracy: LocationAccuracy = .bestAccuracy
     
-    public init() {
-        locationManager = CLLocationManager()
-        proxyDelegate = AsyncDelegateProxy()
-        locationDelegate = LocationDelegate(delegateProxy: proxyDelegate)
-        locationManager.delegate = locationDelegate
-        locationManager.desiredAccuracy = desiredAccuracy.convertingAccuracy
+    public convenience init(desiredAccuracy: LocationAccuracy = .bestAccuracy) {
+        self.init(locationManager: CLLocationManager(), desiredAccuracy: desiredAccuracy)
     }
-    
-    public init(locationManager: CLLocationManager, desiredAccuracy: LocationAccuracy) {
+
+    public init(locationManager: CLLocationManager, desiredAccuracy: LocationAccuracy = .bestAccuracy) {
         self.locationManager = locationManager
         proxyDelegate = AsyncDelegateProxy()
         locationDelegate = LocationDelegate(delegateProxy: proxyDelegate)
@@ -54,10 +49,6 @@ public final class AsyncLocationManager {
         self.locationManager.desiredAccuracy = desiredAccuracy.convertingAccuracy
     }
     
-    public convenience init(desiredAccuracy: LocationAccuracy) {
-        self.init()
-        self.desiredAccuracy = desiredAccuracy
-    }
     
     @available(watchOS 6.0, *)
     public func getAuthorizationStatus() -> CLAuthorizationStatus {
