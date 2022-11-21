@@ -117,7 +117,7 @@ public final class AsyncLocationManager {
         proxyDelegate.cancel(for: AccuracyAuthorizationMonitoringPerformer.self)
     }
 
-    @available(iOS 14, *)
+    @available(iOS 14, watchOS 7, *)
     public func getAccuracyAuthorization() -> CLAccuracyAuthorization {
         locationManager.accuracyAuthorization
     }
@@ -186,7 +186,7 @@ public final class AsyncLocationManager {
         }
     }
 
-    @available(iOS 14, *)
+    @available(iOS 14, watchOS 7, *)
     public func requestTemporaryFullAccuracyAuthorization(purposeKey: String) async -> CLAccuracyAuthorization? {
         await locationPermissionTemporaryFullAccuracy(purposeKey: purposeKey)
     }
@@ -340,7 +340,7 @@ extension AsyncLocationManager {
         })
     }
 
-    @available(iOS 14, *)
+    @available(iOS 14, watchOS 7, *)
     private func locationPermissionTemporaryFullAccuracy(purposeKey: String) async -> CLAccuracyAuthorization? {
         let authorizationPerformer = RequestAccuracyAuthorizationPerformer()
         return await withTaskCancellationHandler(operation: {
