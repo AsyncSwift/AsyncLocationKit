@@ -158,6 +158,15 @@ public final class AsyncLocationManager {
         let authorizationPerformer = RequestAuthorizationPerformer()
         return await withTaskCancellationHandler(operation: {
             await withCheckedContinuation { continuation in
+#if os(macOS)
+                if #available(iOS 14, *), locationManager.authorizationStatus != .notDetermined {
+                    continuation.resume(with: .success(locationManager.authorizationStatus))
+                } else {
+                    authorizationPerformer.linkContinuation(continuation)
+                    proxyDelegate.addPerformer(authorizationPerformer)
+                    locationManager.requestAlwaysAuthorization()
+                }
+#else
                 if #available(iOS 14, *), locationManager.authorizationStatus != .notDetermined && locationManager.authorizationStatus != .authorizedWhenInUse {
                     continuation.resume(with: .success(locationManager.authorizationStatus))
                 } else {
@@ -165,6 +174,7 @@ public final class AsyncLocationManager {
                     proxyDelegate.addPerformer(authorizationPerformer)
                     locationManager.requestAlwaysAuthorization()
                 }
+#endif
             }
         }, onCancel: {
             proxyDelegate.cancel(for: authorizationPerformer.uniqueIdentifier)
@@ -327,6 +337,15 @@ extension AsyncLocationManager {
         let authorizationPerformer = RequestAuthorizationPerformer()
         return await withTaskCancellationHandler(operation: {
             await withCheckedContinuation { continuation in
+#if os(macOS)
+                if #available(iOS 14, watchOS 7, *), locationManager.authorizationStatus != .notDetermined {
+                    continuation.resume(with: .success(locationManager.authorizationStatus))
+                } else {
+                    authorizationPerformer.linkContinuation(continuation)
+                    proxyDelegate.addPerformer(authorizationPerformer)
+                    locationManager.requestAlwaysAuthorization()
+                }
+#else
                 if #available(iOS 14, watchOS 7, *), locationManager.authorizationStatus != .notDetermined && locationManager.authorizationStatus != .authorizedWhenInUse {
                     continuation.resume(with: .success(locationManager.authorizationStatus))
                 } else {
@@ -334,6 +353,7 @@ extension AsyncLocationManager {
                     proxyDelegate.addPerformer(authorizationPerformer)
                     locationManager.requestAlwaysAuthorization()
                 }
+#endif
             }
         }, onCancel: {
             proxyDelegate.cancel(for: authorizationPerformer.uniqueIdentifier)
