@@ -59,8 +59,7 @@ public final class AsyncLocationManager {
         // Though undocumented, `locationServicesEnabled()` must not be called from the main thread. Otherwise,
         // we get a runtime warning "This method can cause UI unresponsiveness if invoked on the main thread"
         // Therefore, we use `Task.detached` to ensure we're off the main thread.
-        // Also, we force `try` as we expect no exceptions to be thrown from `locationServicesEnabled()`
-        try! await Task.detached { CLLocationManager.locationServicesEnabled() }.value
+        await Task.detached { CLLocationManager.locationServicesEnabled() }.value
     }
 
     @available(watchOS 6.0, *)
@@ -133,7 +132,7 @@ public final class AsyncLocationManager {
     @available(*, deprecated, message: "Use new function requestPermission(with:)")
     @available(watchOS 7.0, *)
     public func requestAuthorizationWhenInUse() async -> CLAuthorizationStatus {
-        let authorizationPerformer = RequestAuthorizationPerformer()
+        let authorizationPerformer = RequestAuthorizationPerformer(currentStatus: getAuthorizationStatus())
         return await withTaskCancellationHandler(operation: {
             await withCheckedContinuation { continuation in
                 let authorizationStatus = getAuthorizationStatus()
@@ -155,7 +154,7 @@ public final class AsyncLocationManager {
     @available(watchOS 7.0, *)
     @available(iOS 14, *)
     public func requestAuthorizationAlways() async -> CLAuthorizationStatus {
-        let authorizationPerformer = RequestAuthorizationPerformer()
+        let authorizationPerformer = RequestAuthorizationPerformer(currentStatus: getAuthorizationStatus())
         return await withTaskCancellationHandler(operation: {
             await withCheckedContinuation { continuation in
 #if os(macOS)
@@ -316,7 +315,7 @@ public final class AsyncLocationManager {
 
 extension AsyncLocationManager {
     private func locationPermissionWhenInUse() async -> CLAuthorizationStatus {
-        let authorizationPerformer = RequestAuthorizationPerformer()
+        let authorizationPerformer = RequestAuthorizationPerformer(currentStatus: getAuthorizationStatus())
         return await withTaskCancellationHandler(operation: {
             await withCheckedContinuation { continuation in
                 let authorizationStatus = getAuthorizationStatus()
@@ -334,7 +333,7 @@ extension AsyncLocationManager {
     }
     
     private func locationPermissionAlways() async -> CLAuthorizationStatus {
-        let authorizationPerformer = RequestAuthorizationPerformer()
+        let authorizationPerformer = RequestAuthorizationPerformer(currentStatus: getAuthorizationStatus())
         return await withTaskCancellationHandler(operation: {
             await withCheckedContinuation { continuation in
 #if os(macOS)
@@ -379,6 +378,14 @@ extension AsyncLocationManager {
                             continuation.resume(with: .failure(error))
                             return
                         }
+
+                        // If the user chooses reduced accuracy, the didChangeAuthorization delegate method
+                        // will not called. So we must emulate that here.
+                        if self.locationManager.accuracyAuthorization == .reducedAccuracy {
+                            self.proxyDelegate.eventForMethodInvoked(
+                                .didChangeAccuracyAuthorization(authorization: self.locationManager.accuracyAuthorization)
+                            )
+                        }
                     }
                 }
             }
@@ -387,3 +394,27 @@ extension AsyncLocationManager {
         })
     }
 }
+
+extension CLAuthorizationStatus: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .notDetermined: return ".notDetermined"
+        case .restricted: return ".restricted"
+        case .denied: return ".denied"
+        case .authorizedWhenInUse: return ".authorizedWhenInUse"
+        case .authorizedAlways: return ".authorisedAlways"
+        @unknown default: return "unknown \(rawValue)"
+        }
+    }
+}
+
+extension CLAccuracyAuthorization: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .fullAccuracy: return ".fullAccuracy"
+        case .reducedAccuracy: return ".reducedAccuracy"
+        @unknown default: return "unknown \(rawValue)"
+        }
+    }
+}
+

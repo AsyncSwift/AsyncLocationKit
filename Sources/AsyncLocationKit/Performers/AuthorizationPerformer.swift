@@ -24,6 +24,13 @@ import Foundation
 import CoreLocation.CLLocation
 
 class RequestAuthorizationPerformer: AnyLocationPerformer {
+    private let currentStatus: CLAuthorizationStatus
+    private var applicationStateMonitor: ApplicationStateMonitor!
+
+    init(currentStatus: CLAuthorizationStatus) {
+        self.currentStatus = currentStatus
+    }
+
     var typeIdentifier: ObjectIdentifier {
         return ObjectIdentifier(Self.self)
     }
@@ -38,8 +45,29 @@ class RequestAuthorizationPerformer: AnyLocationPerformer {
     
     func linkContinuation(_ continuation: AuthotizationContinuation) {
         self.continuation = continuation
+        Task { await start() }
     }
-    
+
+    func start() async {
+        applicationStateMonitor = await ApplicationStateMonitor()
+        await applicationStateMonitor.startMonitoringApplicationState()
+
+        // Wait a brief amount of time for the permission dialog to appear.
+        Task { [applicationStateMonitor, currentStatus] in
+            guard let applicationStateMonitor else { return }
+            try await Task.sleep(nanoseconds: UInt64(Double(NSEC_PER_SEC) * 0.3))
+
+            if await !applicationStateMonitor.hasResignedActive {
+                // We timed out waiting for the dialog to appear, so we can assume that the permission request
+                // silently failed. We then emit the `currentStatus` to be returned to the caller.
+                await applicationStateMonitor.stopMonitoringApplicationState()
+                await MainActor.run {
+                    self.invokedMethod(event:.didChangeAuthorization(status: currentStatus))
+                }
+            }
+        }
+    }
+
     func eventSupported(_ event: CoreLocationDelegateEvent) -> Bool {
         return eventsSupport.contains(event.rawEvent())
     }
@@ -48,15 +76,26 @@ class RequestAuthorizationPerformer: AnyLocationPerformer {
         switch event {
         case .didChangeAuthorization(let status):
             if status != .notDetermined {
-                guard let continuation = continuation else { cancellabel?.cancel(for: self); return }
-                continuation.resume(returning: status)
-                self.continuation = nil
-                cancellabel?.cancel(for: self)
+                Task {
+                    if await applicationStateMonitor.hasResignedActive {
+                        _ = await applicationStateMonitor.hasBecomeActive()
+                    }
+
+                    guard let continuation = continuation else { cancellabel?.cancel(for: self); return }
+                    continuation.resume(returning: status)
+                    self.continuation = nil
+                    cancellabel?.cancel(for: self)
+                }
             }
         default:
             fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
         }
     }
-    
-    func cancelation() { }
+
+    func cancelation() {
+        Task {
+            await applicationStateMonitor.stopMonitoringApplicationState()
+        }
+    }
 }
+
