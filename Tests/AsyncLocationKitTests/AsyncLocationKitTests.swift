@@ -14,7 +14,17 @@ final class AsyncLocationKitTests: XCTestCase {
         locationManager.updateAccuracy(with: secondAccuracy)
         XCTAssertTrue(AsyncLocationKitTests.mockLocationManager.desiredAccuracy == secondAccuracy.convertingAccuracy)
     }
-    
+
+    func testAllowsBackgroundLocationUpdates() {
+        let firstAllows = true
+        let locationManager = AsyncLocationManager(locationManager: AsyncLocationKitTests.mockLocationManager, allowsBackgroundLocationUpdates: firstAllows)
+        XCTAssertTrue(AsyncLocationKitTests.mockLocationManager.allowsBackgroundLocationUpdates == firstAllows)
+
+        let secondAllows = false
+        locationManager.updateAllowsBackgroundLocationUpdates(with: secondAllows)
+        XCTAssertTrue(AsyncLocationKitTests.mockLocationManager.allowsBackgroundLocationUpdates == secondAllows)
+    }
+
     func testRequestLocation() async {
         do {
             let locationManager = AsyncLocationManager(locationManager: AsyncLocationKitTests.mockLocationManager)

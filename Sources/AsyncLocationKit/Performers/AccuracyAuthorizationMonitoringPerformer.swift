@@ -23,54 +23,37 @@
 import Foundation
 import CoreLocation
 
-@available(watchOS, unavailable)
-public enum BeaconRangeEvent {
-    case didRange(beacons: [CLBeacon], beaconConstraint: CLBeaconIdentityConstraint)
-    case didFailRanginFor(beaconConstraint: CLBeaconIdentityConstraint, error: Error)
+public enum AccuracyAuthorizationEvent {
+    case didUpdate(accuracyAuthorization: CLAccuracyAuthorization)
 }
 
-@available(watchOS, unavailable)
-class BeaconsRangePerformer: AnyLocationPerformer {
+class AccuracyAuthorizationMonitoringPerformer: AnyLocationPerformer {
     var typeIdentifier: ObjectIdentifier {
         return ObjectIdentifier(Self.self)
     }
-    
+
     var uniqueIdentifier: UUID = UUID()
-    
+
     var cancellabel: Cancellabel?
-    
-    var eventssupported: [CoreLocationEventSupport] = [.didRangeBeacons, .didFailRanginForBeaconConstraint]
-    
-    @available(watchOS, unavailable)
-    var satisfying: CLBeaconIdentityConstraint
-    
-    @available(watchOS, unavailable)
-    var stream: BeaconsRangingStream.Continuation?
-    
-    @available(watchOS, unavailable)
-    init(satisfying: CLBeaconIdentityConstraint) {
-        self.satisfying = satisfying
+    var eventsSupport: [CoreLocationEventSupport] = [.didChangeAccuracyAuthorization]
+    var stream: AccuracyAuthorizationStream.Continuation?
+
+    func linkContinuation(_ continuation: AccuracyAuthorizationStream.Continuation) {
+        stream = continuation
     }
-    
-    @available(watchOS, unavailable)
-    func linkContinuation(_ continuation: BeaconsRangingStream.Continuation) {
-        self.stream = continuation
-    }
-    
+
     func eventSupported(_ event: CoreLocationDelegateEvent) -> Bool {
-        return eventssupported.contains(event.rawEvent())
+        return eventsSupport.contains(event.rawEvent())
     }
-    
+
     func invokedMethod(event: CoreLocationDelegateEvent) {
         switch event {
-        case .didRange(let beacons, let beaconConstraint):
-            stream?.yield(.didRange(beacons: beacons, beaconConstraint: beaconConstraint))
-        case .didFailRanginFor(let beaconConstraint, let error):
-            stream?.yield(.didFailRanginFor(beaconConstraint: beaconConstraint, error: error))
+        case .didChangeAccuracyAuthorization(let accuracyAuthorization):
+            stream?.yield(.didUpdate(accuracyAuthorization: accuracyAuthorization))
         default:
             fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
         }
     }
-    
-    func cancelation() { }   
+
+    func cancelation() { }
 }

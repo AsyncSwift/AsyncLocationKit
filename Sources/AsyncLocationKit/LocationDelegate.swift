@@ -32,15 +32,28 @@ internal class LocationDelegate: NSObject, CLLocationManagerDelegate {
     }
     
 //    MARK: - Authorize
+    @available(watchOS 7.0, *)
     @available(iOS 14, *)
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         proxy?.eventForMethodInvoked(.didChangeAuthorization(status: manager.authorizationStatus))
+        proxy?.eventForMethodInvoked(.didChangeAccuracyAuthorization(authorization: manager.accuracyAuthorization))
+        locationServicesEnabledDidChange()
     }
-    
+
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         proxy?.eventForMethodInvoked(.didChangeAuthorization(status: status))
+        locationServicesEnabledDidChange()
     }
-    
+
+    private func locationServicesEnabledDidChange() {
+        Task {
+            let enabled = CLLocationManager.locationServicesEnabled()
+            await MainActor.run {
+                proxy?.eventForMethodInvoked(.didChangeLocationEnabled(enabled: enabled))
+            }
+        }
+    }
+
 //    MARK: - Stream new event with locations/heading/region
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         proxy?.eventForMethodInvoked(.didUpdate(locations: locations))
@@ -50,6 +63,7 @@ internal class LocationDelegate: NSObject, CLLocationManagerDelegate {
         proxy?.eventForMethodInvoked(.didUpdateHeading(heading: newHeading))
     }
     
+    #if os(iOS) || os(tvOS)
     func locationManager(_ manager: CLLocationManager, didDetermineState state: CLRegionState, for region: CLRegion) {
         proxy?.eventForMethodInvoked(.didDetermine(state: state, forRegion: region))
     }
@@ -75,12 +89,14 @@ internal class LocationDelegate: NSObject, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didStartMonitoringFor region: CLRegion) {
         proxy?.eventForMethodInvoked(.didStartMonitoringFor(region: region))
     }
+    #endif
     
 //    MARK: - Fails methods
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         proxy?.eventForMethodInvoked(.didFailWithError(error: error))
     }
     
+    #if os(iOS) || os(tvOS)
     func locationManager(_ manager: CLLocationManager, monitoringDidFailFor region: CLRegion?, withError error: Error) {
         proxy?.eventForMethodInvoked(.monitoringDidFailFor(region: region, error: error))
     }
@@ -98,4 +114,5 @@ internal class LocationDelegate: NSObject, CLLocationManagerDelegate {
     func locationManagerDidResumeLocationUpdates(_ manager: CLLocationManager) {
         proxy?.eventForMethodInvoked(.locationUpdatesResume)
     }
+    #endif
 }

@@ -7,7 +7,8 @@ let package = Package(
     name: "AsyncLocationKit",
     platforms: [
         .iOS("13.0"),
-        .macOS(.v12)
+        .macOS(.v12),
+        .watchOS(.v6)
     ],
     
     products: [
