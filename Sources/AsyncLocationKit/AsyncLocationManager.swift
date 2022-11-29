@@ -42,7 +42,7 @@ public final class AsyncLocationManager {
     private var locationDelegate: CLLocationManagerDelegate
     
     public convenience init(desiredAccuracy: LocationAccuracy = .bestAccuracy, allowsBackgroundLocationUpdates: Bool = false) {
-        self.init(locationManager: CLLocationManager(), desiredAccuracy: desiredAccuracy)
+        self.init(locationManager: CLLocationManager(), desiredAccuracy: desiredAccuracy, allowsBackgroundLocationUpdates: allowsBackgroundLocationUpdates)
     }
 
     public init(locationManager: CLLocationManager, desiredAccuracy: LocationAccuracy = .bestAccuracy, allowsBackgroundLocationUpdates: Bool = false) {
