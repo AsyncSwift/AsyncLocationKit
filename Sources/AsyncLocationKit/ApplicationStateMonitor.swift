@@ -6,13 +6,6 @@
 //
 
 import Foundation
-//#if os(iOS)
-//import UIKit
-//#elseif os(macOS)
-//import AppKit
-//#elseif os(watchOS)
-//import WatchKit
-//#endif
 
 @MainActor
 class ApplicationStateMonitor {
