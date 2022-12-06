@@ -6,7 +6,13 @@
 //
 
 import Foundation
-import UIKit
+//#if os(iOS)
+//import UIKit
+//#elseif os(macOS)
+//import AppKit
+//#elseif os(watchOS)
+//import WatchKit
+//#endif
 
 @MainActor
 class ApplicationStateMonitor {
@@ -88,11 +94,11 @@ class ApplicationStateMonitor {
 
     private var _hasResignedActiveSequence: Any? = {
         guard #available(macOS 12, iOS 15, tvOS 15, watchOS 8, *) else { return nil }
-        return NotificationCenter.default.notifications(named: UIApplication.willResignActiveNotification).map { _ in true }
+        return NotificationCenter.default.notifications(named: NotificationNamesConstants.willResignActiveName).map { _ in true }
     }()
 
     private var _hasBecomeActiveSequence: Any? = {
         guard #available(macOS 12, iOS 15, tvOS 15, watchOS 8, *) else { return nil }
-        return NotificationCenter.default.notifications(named: UIApplication.didBecomeActiveNotification).map { _ in true }
+        return NotificationCenter.default.notifications(named: NotificationNamesConstants.didBecomeActiveName).map { _ in true }
     }()
 }
