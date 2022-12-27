@@ -11,13 +11,13 @@ Wrapper for Apple `CoreLocation` framework with new Concurency Model. No more `d
 ##### SPM
 ```swift
 dependencies: [
-    .package(url: "https://github.com/AsyncSwift/AsyncLocationKit.git", .upToNextMinor(from: "1.5.5"))
+    .package(url: "https://github.com/AsyncSwift/AsyncLocationKit.git", .upToNextMinor(from: "1.6.1"))
 ]
 ```
 
 #### Cocoapods
 ```
-pod 'AsyncLocationKit', :git => 'https://github.com/AsyncSwift/AsyncLocationKit.git', :tag => '1.5.5'
+pod 'AsyncLocationKit', :git => 'https://github.com/AsyncSwift/AsyncLocationKit.git', :tag => '1.6.1'
 ```
 
 
