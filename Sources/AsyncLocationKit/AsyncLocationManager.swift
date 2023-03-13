@@ -235,6 +235,7 @@ public final class AsyncLocationManager {
         let performer = RegionMonitoringPerformer(region: region)
         return RegionMonitoringStream { streamContinuation in
             performer.linkContinuation(streamContinuation)
+            proxyDelegate.addPerformer(performer)
             locationManager.startMonitoring(for: region)
             streamContinuation.onTermination = { @Sendable _ in
                 self.proxyDelegate.cancel(for: performer.uniqueIdentifier)
