@@ -50,9 +50,10 @@ class HeadingMonitorPerformer: AnyLocationPerformer {
     
     func invokedMethod(event: CoreLocationDelegateEvent) {
         switch event {
+        #if !os(tvOS)
         case .didUpdateHeading(let heading):
-            break
-            // stream?.yield(.didUpdate(heading: heading))
+            stream?.yield(.didUpdate(heading: heading))
+            #endif
         case .didFailWithError(let error):
             stream?.yield(.didFailWith(error: error))
         default:

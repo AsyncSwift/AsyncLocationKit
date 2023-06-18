@@ -67,7 +67,9 @@ final class AsyncDelegateProxy: AsyncDelegateProxyInterface {
     func eventForMethodInvoked(_ event: CoreLocationDelegateEvent) {
         for performer in performers {
             if performer.eventSupported(event) {
-                // performer.invokedMethod(event: event)
+                #if !os(tvOS)
+                performer.invokedMethod(event: event)
+                #endif
             }
         }
     }

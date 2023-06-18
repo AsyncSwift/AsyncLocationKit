@@ -25,10 +25,10 @@ import CoreLocation
 
 @available(watchOS, unavailable)
 public enum BeaconRangeEvent {
-    #if !os(tvOS)
+    @available(tvOS, unavailable)
     case didRange(beacons: [CLBeacon], beaconConstraint: CLBeaconIdentityConstraint)
+    @available(tvOS, unavailable)
     case didFailRanginFor(beaconConstraint: CLBeaconIdentityConstraint, error: Error)
-    #endif
 }
 
 @available(watchOS, unavailable)
@@ -65,15 +65,14 @@ class BeaconsRangePerformer: AnyLocationPerformer {
         return eventssupported.contains(event.rawEvent())
     }
     
-    @available(tvOS, unavailable)
     func invokedMethod(event: CoreLocationDelegateEvent) {
         switch event {
+        #if !os(tvOS)
         case .didRange(let beacons, let beaconConstraint):
-            break
-            // stream?.yield(.didRange(beacons: beacons, beaconConstraint: beaconConstraint))
+            stream?.yield(.didRange(beacons: beacons, beaconConstraint: beaconConstraint))
         case .didFailRanginFor(let beaconConstraint, let error):
-            break
-            // stream?.yield(.didFailRanginFor(beaconConstraint: beaconConstraint, error: error))
+            stream?.yield(.didFailRanginFor(beaconConstraint: beaconConstraint, error: error))
+        #endif
         default:
             fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
         }
