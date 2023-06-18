@@ -25,6 +25,7 @@ import CoreLocation.CLVisit
 
 public enum VisitMonitoringEvent {
     @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
     case didVisit(visit: CLVisit)
     case didFailWithError(error: Error)
 }
@@ -53,7 +54,7 @@ class VisitMonitoringPerformer: AnyLocationPerformer {
         case .didFailWithError(let error):
             stream?.yield(.didFailWithError(error: error))
         case .didVisit(let visit):
-            #if os(iOS) || os(tvOS)
+            #if os(iOS)
             stream?.yield(.didVisit(visit: visit))
             #endif
         default:

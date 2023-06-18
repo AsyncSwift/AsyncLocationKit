@@ -28,6 +28,8 @@ protocol AnyLocationPerformer: AnyObject {
     var cancellabel: Cancellabel? { get set }
     
     func eventSupported(_ event: CoreLocationDelegateEvent) -> Bool
+    #if !os(tvOS)
     func invokedMethod(event: CoreLocationDelegateEvent)
+    #endif
     func cancelation()
 }

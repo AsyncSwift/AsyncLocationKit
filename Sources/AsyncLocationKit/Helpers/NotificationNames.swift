@@ -21,7 +21,7 @@
 //  SOFTWARE.
 
 import Foundation
-#if os(iOS)
+#if os(iOS) || os(tvOS)
 import UIKit
 #elseif os(macOS)
 import AppKit
@@ -31,7 +31,7 @@ import WatchKit
 
 @available(macOS 12, iOS 13, tvOS 13, watchOS 8, *)
 struct NotificationNamesConstants {
-#if os(iOS)
+#if os(iOS) || os(tvOS)
     static let willResignActiveName = UIApplication.willResignActiveNotification
 #elseif os(macOS)
     static let willResignActiveName = NSApplication.willResignActiveNotification
@@ -39,7 +39,7 @@ struct NotificationNamesConstants {
     static let willResignActiveName = WKExtension.applicationWillResignActiveNotification
 #endif
     
-#if os(iOS)
+#if os(iOS) || os(tvOS)
     static let didBecomeActiveName = UIApplication.didBecomeActiveNotification
 #elseif os(macOS)
     static let didBecomeActiveName = NSApplication.didBecomeActiveNotification

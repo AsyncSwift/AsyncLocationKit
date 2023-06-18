@@ -16,6 +16,7 @@ final class AsyncLocationKitTests: XCTestCase {
     }
 
     func testAllowsBackgroundLocationUpdates() {
+        #if !os(tvOS)
         let firstAllows = true
         let locationManager = AsyncLocationManager(locationManager: AsyncLocationKitTests.mockLocationManager, allowsBackgroundLocationUpdates: firstAllows)
         XCTAssertTrue(AsyncLocationKitTests.mockLocationManager.allowsBackgroundLocationUpdates == firstAllows)
@@ -23,6 +24,7 @@ final class AsyncLocationKitTests: XCTestCase {
         let secondAllows = false
         locationManager.updateAllowsBackgroundLocationUpdates(with: secondAllows)
         XCTAssertTrue(AsyncLocationKitTests.mockLocationManager.allowsBackgroundLocationUpdates == secondAllows)
+        #endif
     }
 
     func testRequestLocation() async {
