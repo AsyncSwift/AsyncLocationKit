@@ -152,10 +152,9 @@ public final class AsyncLocationManager {
         })
     }
     
-#if !APPCLIP
+#if !APPCLIP && !os(tvOS)
     @available(*, deprecated, message: "Use new function requestPermission(with:)")
-    @available(tvOS, unavailable)
-    @available(iOS 14, tvOS 14, *)
+    @available(iOS 14, *)
     public func requestAuthorizationAlways() async -> CLAuthorizationStatus {
         let authorizationPerformer = RequestAuthorizationPerformer(currentStatus: getAuthorizationStatus())
         return await withTaskCancellationHandler(operation: {
@@ -174,8 +173,7 @@ public final class AsyncLocationManager {
                 } else {
                     authorizationPerformer.linkContinuation(continuation)
                     proxyDelegate.addPerformer(authorizationPerformer)
-                    // TODO
-                    // locationManager.requestAlwaysAuthorization()
+                    locationManager.requestAlwaysAuthorization()
                 }
 #endif
             }
@@ -360,10 +358,11 @@ extension AsyncLocationManager {
                 if #available(iOS 14, tvOS 14, watchOS 7, *), locationManager.authorizationStatus != .notDetermined && locationManager.authorizationStatus != .authorizedWhenInUse {
                     continuation.resume(with: .success(locationManager.authorizationStatus))
                 } else {
+                    #if !os(tvOS)
                     authorizationPerformer.linkContinuation(continuation)
                     proxyDelegate.addPerformer(authorizationPerformer)
-                    // TODO
-                    // locationManager.requestAlwaysAuthorization()
+                    locationManager.requestAlwaysAuthorization()
+                    #endif
                 }
 #endif
             }
