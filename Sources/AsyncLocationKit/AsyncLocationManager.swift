@@ -34,6 +34,7 @@ public typealias HeadingMonitorStream = AsyncStream<HeadingMonitorEvent>
 public typealias AuthorizationStream = AsyncStream<AuthorizationEvent>
 public typealias AccuracyAuthorizationStream = AsyncStream<AccuracyAuthorizationEvent>
 @available(watchOS, unavailable)
+@available(tvOS, unavailable)
 public typealias BeaconsRangingStream = AsyncStream<BeaconRangeEvent>
 
 public final class AsyncLocationManager {
@@ -154,6 +155,7 @@ public final class AsyncLocationManager {
     
 #if !APPCLIP && !os(tvOS)
     @available(*, deprecated, message: "Use new function requestPermission(with:)")
+    @available(watchOS 7.0, *)
     @available(iOS 14, *)
     public func requestAuthorizationAlways() async -> CLAuthorizationStatus {
         let authorizationPerformer = RequestAuthorizationPerformer(currentStatus: getAuthorizationStatus())
