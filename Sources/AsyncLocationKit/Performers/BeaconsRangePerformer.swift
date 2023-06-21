@@ -24,6 +24,7 @@ import Foundation
 import CoreLocation
 
 @available(watchOS, unavailable)
+@available(tvOS, unavailable)
 public enum BeaconRangeEvent {
     case didRange(beacons: [CLBeacon], beaconConstraint: CLBeaconIdentityConstraint)
     case didFailRanginFor(beaconConstraint: CLBeaconIdentityConstraint, error: Error)
@@ -42,17 +43,21 @@ class BeaconsRangePerformer: AnyLocationPerformer {
     var eventssupported: [CoreLocationEventSupport] = [.didRangeBeacons, .didFailRanginForBeaconConstraint]
     
     @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
     var satisfying: CLBeaconIdentityConstraint
     
     @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
     var stream: BeaconsRangingStream.Continuation?
     
     @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
     init(satisfying: CLBeaconIdentityConstraint) {
         self.satisfying = satisfying
     }
     
     @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
     func linkContinuation(_ continuation: BeaconsRangingStream.Continuation) {
         self.stream = continuation
     }
@@ -63,10 +68,12 @@ class BeaconsRangePerformer: AnyLocationPerformer {
     
     func invokedMethod(event: CoreLocationDelegateEvent) {
         switch event {
+        #if !os(tvOS)
         case .didRange(let beacons, let beaconConstraint):
             stream?.yield(.didRange(beacons: beacons, beaconConstraint: beaconConstraint))
         case .didFailRanginFor(let beaconConstraint, let error):
             stream?.yield(.didFailRanginFor(beaconConstraint: beaconConstraint, error: error))
+        #endif
         default:
             fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
         }

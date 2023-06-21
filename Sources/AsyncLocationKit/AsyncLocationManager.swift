@@ -34,6 +34,7 @@ public typealias HeadingMonitorStream = AsyncStream<HeadingMonitorEvent>
 public typealias AuthorizationStream = AsyncStream<AuthorizationEvent>
 public typealias AccuracyAuthorizationStream = AsyncStream<AccuracyAuthorizationEvent>
 @available(watchOS, unavailable)
+@available(tvOS, unavailable)
 public typealias BeaconsRangingStream = AsyncStream<BeaconRangeEvent>
 
 public final class AsyncLocationManager {
@@ -51,7 +52,9 @@ public final class AsyncLocationManager {
         locationDelegate = LocationDelegate(delegateProxy: proxyDelegate)
         self.locationManager.delegate = locationDelegate
         self.locationManager.desiredAccuracy = desiredAccuracy.convertingAccuracy
+        #if !os(tvOS)
         self.locationManager.allowsBackgroundLocationUpdates = allowsBackgroundLocationUpdates
+        #endif
     }
     
     
@@ -64,7 +67,7 @@ public final class AsyncLocationManager {
 
     @available(watchOS 6.0, *)
     public func getAuthorizationStatus() -> CLAuthorizationStatus {
-        if #available(iOS 14, watchOS 7, *) {
+        if #available(iOS 14, tvOS 14, watchOS 7, *) {
             return locationManager.authorizationStatus
         } else {
             return CLLocationManager.authorizationStatus()
@@ -116,7 +119,7 @@ public final class AsyncLocationManager {
         proxyDelegate.cancel(for: AccuracyAuthorizationMonitoringPerformer.self)
     }
 
-    @available(iOS 14, watchOS 7, *)
+    @available(iOS 14, tvOS 14, watchOS 7, *)
     public func getAccuracyAuthorization() -> CLAccuracyAuthorization {
         locationManager.accuracyAuthorization
     }
@@ -125,6 +128,7 @@ public final class AsyncLocationManager {
         locationManager.desiredAccuracy = newAccuracy.convertingAccuracy
     }
 
+    @available(tvOS, unavailable)
     public func updateAllowsBackgroundLocationUpdates(with newAllows: Bool) {
         locationManager.allowsBackgroundLocationUpdates = newAllows
     }
@@ -149,7 +153,7 @@ public final class AsyncLocationManager {
         })
     }
     
-#if !APPCLIP
+#if !APPCLIP && !os(tvOS)
     @available(*, deprecated, message: "Use new function requestPermission(with:)")
     @available(watchOS 7.0, *)
     @available(iOS 14, *)
@@ -195,11 +199,12 @@ public final class AsyncLocationManager {
         }
     }
 
-    @available(iOS 14, watchOS 7, *)
+    @available(iOS 14, tvOS 14, watchOS 7, *)
     public func requestTemporaryFullAccuracyAuthorization(purposeKey: String) async throws -> CLAccuracyAuthorization? {
         try await locationPermissionTemporaryFullAccuracy(purposeKey: purposeKey)
     }
 
+    @available(tvOS, unavailable)
     public func startUpdatingLocation() async -> LocationStream {
         let monitoringPerformer = MonitoringUpdateLocationPerformer()
         return LocationStream { streamContinuation in
@@ -231,6 +236,7 @@ public final class AsyncLocationManager {
     }
     
     @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
     public func startMonitoring(for region: CLRegion) async -> RegionMonitoringStream {
         let performer = RegionMonitoringPerformer(region: region)
         return RegionMonitoringStream { streamContinuation in
@@ -244,6 +250,7 @@ public final class AsyncLocationManager {
     }
     
     @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
     public func stopMonitoring(for region: CLRegion) {
         proxyDelegate.cancel(for: RegionMonitoringPerformer.self) { regionMonitoring in
             guard let regionPerformer = regionMonitoring as? RegionMonitoringPerformer else { return false }
@@ -253,6 +260,7 @@ public final class AsyncLocationManager {
     }
     
     @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
     public func startMonitoringVisit() async -> VisitMonitoringStream {
         let performer = VisitMonitoringPerformer()
         return VisitMonitoringStream { stream in
@@ -266,6 +274,7 @@ public final class AsyncLocationManager {
     }
     
     @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
     public func stopMonitoringVisit() {
         proxyDelegate.cancel(for: VisitMonitoringPerformer.self)
         locationManager.stopMonitoringVisits()
@@ -292,6 +301,7 @@ public final class AsyncLocationManager {
 #endif
     
     @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
     public func startRangingBeacons(satisfying: CLBeaconIdentityConstraint) async -> BeaconsRangingStream {
         let performer = BeaconsRangePerformer(satisfying: satisfying)
         return BeaconsRangingStream { stream in
@@ -305,6 +315,7 @@ public final class AsyncLocationManager {
     }
     
     @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
     public func stopRangingBeacons(satisfying: CLBeaconIdentityConstraint) {
         proxyDelegate.cancel(for: BeaconsRangePerformer.self) { beaconsMonitoring in
             guard let beaconsPerformer = beaconsMonitoring as? BeaconsRangePerformer else { return false }
@@ -346,12 +357,14 @@ extension AsyncLocationManager {
                     locationManager.requestAlwaysAuthorization()
                 }
 #else
-                if #available(iOS 14, watchOS 7, *), locationManager.authorizationStatus != .notDetermined && locationManager.authorizationStatus != .authorizedWhenInUse {
+                if #available(iOS 14, tvOS 14, watchOS 7, *), locationManager.authorizationStatus != .notDetermined && locationManager.authorizationStatus != .authorizedWhenInUse {
                     continuation.resume(with: .success(locationManager.authorizationStatus))
                 } else {
+                    #if !os(tvOS)
                     authorizationPerformer.linkContinuation(continuation)
                     proxyDelegate.addPerformer(authorizationPerformer)
                     locationManager.requestAlwaysAuthorization()
+                    #endif
                 }
 #endif
             }
@@ -360,7 +373,7 @@ extension AsyncLocationManager {
         })
     }
 
-    @available(iOS 14, watchOS 7, *)
+    @available(iOS 14, tvOS 14, watchOS 7, *)
     private func locationPermissionTemporaryFullAccuracy(purposeKey: String) async throws -> CLAccuracyAuthorization? {
         let authorizationPerformer = RequestAccuracyAuthorizationPerformer()
         return try await withTaskCancellationHandler(operation: {

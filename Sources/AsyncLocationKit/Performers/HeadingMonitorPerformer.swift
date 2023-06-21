@@ -24,6 +24,7 @@ import Foundation
 import CoreLocation.CLHeading
 
 public enum HeadingMonitorEvent {
+    @available(tvOS, unavailable)
     case didUpdate(heading: CLHeading)
     case didFailWith(error: Error)
 }
@@ -49,8 +50,10 @@ class HeadingMonitorPerformer: AnyLocationPerformer {
     
     func invokedMethod(event: CoreLocationDelegateEvent) {
         switch event {
+        #if !os(tvOS)
         case .didUpdateHeading(let heading):
             stream?.yield(.didUpdate(heading: heading))
+            #endif
         case .didFailWithError(let error):
             stream?.yield(.didFailWith(error: error))
         default:

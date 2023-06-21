@@ -11,6 +11,7 @@ import CoreLocation
 class MockLocationManager: CLLocationManager {
     private var mockAllowsBackgroundLocationUpdates: Bool = false
     
+    #if !os(tvOS)
     override var allowsBackgroundLocationUpdates: Bool {
         get {
             return mockAllowsBackgroundLocationUpdates
@@ -19,6 +20,7 @@ class MockLocationManager: CLLocationManager {
             mockAllowsBackgroundLocationUpdates = newValue
         }
     }
+    #endif
     
     override var location: CLLocation? {
         return CLLocation(latitude: 100, longitude: 200)

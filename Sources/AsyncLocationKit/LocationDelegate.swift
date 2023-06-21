@@ -33,7 +33,7 @@ internal class LocationDelegate: NSObject, CLLocationManagerDelegate {
     
 //    MARK: - Authorize
     @available(watchOS 7.0, *)
-    @available(iOS 14, *)
+    @available(iOS 14, tvOS 14, *)
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         proxy?.eventForMethodInvoked(.didChangeAuthorization(status: manager.authorizationStatus))
         proxy?.eventForMethodInvoked(.didChangeAccuracyAuthorization(authorization: manager.accuracyAuthorization))
@@ -59,11 +59,13 @@ internal class LocationDelegate: NSObject, CLLocationManagerDelegate {
         proxy?.eventForMethodInvoked(.didUpdate(locations: locations))
     }
     
+    #if !os(tvOS)
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         proxy?.eventForMethodInvoked(.didUpdateHeading(heading: newHeading))
     }
+    #endif
     
-    #if os(iOS) || os(tvOS)
+    #if os(iOS)
     func locationManager(_ manager: CLLocationManager, didDetermineState state: CLRegionState, for region: CLRegion) {
         proxy?.eventForMethodInvoked(.didDetermine(state: state, forRegion: region))
     }
@@ -96,7 +98,7 @@ internal class LocationDelegate: NSObject, CLLocationManagerDelegate {
         proxy?.eventForMethodInvoked(.didFailWithError(error: error))
     }
     
-    #if os(iOS) || os(tvOS)
+    #if os(iOS)
     func locationManager(_ manager: CLLocationManager, monitoringDidFailFor region: CLRegion?, withError error: Error) {
         proxy?.eventForMethodInvoked(.monitoringDidFailFor(region: region, error: error))
     }
