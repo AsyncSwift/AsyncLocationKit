@@ -11,13 +11,13 @@ Wrapper for Apple `CoreLocation` framework with new Concurency Model. No more `d
 ##### SPM
 ```swift
 dependencies: [
-    .package(url: "https://github.com/AsyncSwift/AsyncLocationKit.git", .upToNextMinor(from: "1.6.3"))
+    .package(url: "https://github.com/AsyncSwift/AsyncLocationKit.git", .upToNextMinor(from: "1.6.4"))
 ]
 ```
 
 #### Cocoapods
 ```
-pod 'AsyncLocationKit', :git => 'https://github.com/AsyncSwift/AsyncLocationKit.git', :tag => '1.6.3'
+pod 'AsyncLocationKit', :git => 'https://github.com/AsyncSwift/AsyncLocationKit.git', :tag => '1.6.4'
 ```
 
 
@@ -28,32 +28,26 @@ import AsyncLocationKit
 
 let asyncLocationManager = AsyncLocationManager(desiredAccuracy: .bestAccuracy)
 
-Task {
-    let permission = await self.asyncLocationManager.requestAuthorizationWhenInUse() //returns CLAuthorizationStatus
-}
+let permission = await self.asyncLocationManager.requestAuthorizationWhenInUse() //returns CLAuthorizationStatus
 ```
 
 You can use all methods from Apple `CLLocationManager`.
 
 ```swift
-Task {
-    let coordinate = try await asyncLocationManager.requestLocation() //Request user location once
-}
+let coordinate = try await asyncLocationManager.requestLocation() //Request user location once
 ```
 
 Start monitoring update of user location with `AsyncStream`.
 
 ```swift
-Task {
-    for await locationUpdateEvent in await asyncLocationManager.startUpdatingLocation() {
-        switch locationUpdateEvent {
-        case .didUpdateLocations(let locations):
-            // do something
-        case .didFailWith(let error):
-            // do something
-        case .didPaused, .didResume: 
-            break
-        }
+for await locationUpdateEvent in await asyncLocationManager.startUpdatingLocation() {
+    switch locationUpdateEvent {
+    case .didUpdateLocations(let locations):
+        // do something
+    case .didFailWith(let error):
+        // do something
+    case .didPaused, .didResume: 
+        break
     }
 }
 ```
