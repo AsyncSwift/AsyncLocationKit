@@ -34,7 +34,7 @@ class LocationEnabledMonitoringPerformer: AnyLocationPerformer {
 
     var uniqueIdentifier: UUID = UUID()
 
-    var cancellabel: Cancellabel?
+    var cancellable: Cancellable?
     var eventsSupport: [CoreLocationEventSupport] = [.didChangeLocationEnabled]
     var stream: LocationEnabledStream.Continuation?
 

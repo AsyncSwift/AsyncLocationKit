@@ -32,7 +32,7 @@ class SingleLocationUpdatePerformer: AnyLocationPerformer {
     
     var eventsSupport: [CoreLocationEventSupport] = [.didUpdateLocations, .didFailWithError]
     
-    var cancellabel: Cancellabel?
+    var cancellable: Cancellable?
     var continuation: LocationOnceContinuation?
     
     func linkContinuation(_ continuation: LocationOnceContinuation) {
@@ -48,11 +48,11 @@ class SingleLocationUpdatePerformer: AnyLocationPerformer {
         case .didUpdate(let locations):
             continuation?.resume(returning: .didUpdateLocations(locations: locations))
             continuation = nil
-            cancellabel?.cancel(for: self)
+            cancellable?.cancel(for: self)
         case .didFailWithError(let error):
             continuation?.resume(throwing: error)
             continuation = nil
-            cancellabel?.cancel(for: self)
+            cancellable?.cancel(for: self)
         default:
             fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
         }

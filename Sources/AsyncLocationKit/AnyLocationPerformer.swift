@@ -25,7 +25,7 @@ import Foundation
 protocol AnyLocationPerformer: AnyObject {
     var typeIdentifier: ObjectIdentifier { get }
     var uniqueIdentifier: UUID { get }
-    var cancellabel: Cancellabel? { get set }
+    var cancellable: Cancellable? { get set }
     
     func eventSupported(_ event: CoreLocationDelegateEvent) -> Bool
     func invokedMethod(event: CoreLocationDelegateEvent)

@@ -34,7 +34,7 @@ class AuthorizationMonitoringPerformer: AnyLocationPerformer {
 
     var uniqueIdentifier: UUID = UUID()
 
-    var cancellabel: Cancellabel?
+    var cancellable: Cancellable?
     var eventsSupport: [CoreLocationEventSupport] = [.didChangeAuthorization]
     var stream: AuthorizationStream.Continuation?
 

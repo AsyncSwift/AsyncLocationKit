@@ -41,7 +41,7 @@ class RequestAuthorizationPerformer: AnyLocationPerformer {
     
     var continuation: AuthotizationContinuation?
     
-    weak var cancellabel: Cancellabel?
+    weak var cancellable: Cancellable?
     
     func linkContinuation(_ continuation: AuthotizationContinuation) {
         self.continuation = continuation
@@ -81,10 +81,10 @@ class RequestAuthorizationPerformer: AnyLocationPerformer {
                         _ = await applicationStateMonitor.hasBecomeActive()
                     }
 
-                    guard let continuation = continuation else { cancellabel?.cancel(for: self); return }
+                    guard let continuation = continuation else { cancellable?.cancel(for: self); return }
                     continuation.resume(returning: status)
                     self.continuation = nil
-                    cancellabel?.cancel(for: self)
+                    cancellable?.cancel(for: self)
                 }
             }
         default:

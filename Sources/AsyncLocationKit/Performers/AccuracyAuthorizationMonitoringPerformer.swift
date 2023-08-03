@@ -34,7 +34,7 @@ class AccuracyAuthorizationMonitoringPerformer: AnyLocationPerformer {
 
     var uniqueIdentifier: UUID = UUID()
 
-    var cancellabel: Cancellabel?
+    var cancellable: Cancellable?
     var eventsSupport: [CoreLocationEventSupport] = [.didChangeAccuracyAuthorization]
     var stream: AccuracyAuthorizationStream.Continuation?
 

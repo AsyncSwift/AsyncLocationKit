@@ -37,7 +37,7 @@ class RegionMonitoringPerformer: AnyLocationPerformer {
     
     var uniqueIdentifier: UUID = UUID()
     
-    var cancellabel: Cancellabel?
+    var cancellable: Cancellable?
     var eventsSupport: [CoreLocationEventSupport] = [.didEnterRegion, .didExitRegion, .monitoringDidFailForRegion, .didStartMonitoringForRegion]
     var stream: RegionMonitoringStream.Continuation?
     var region: CLRegion

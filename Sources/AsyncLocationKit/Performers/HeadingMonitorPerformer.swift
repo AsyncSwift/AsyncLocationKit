@@ -36,7 +36,7 @@ class HeadingMonitorPerformer: AnyLocationPerformer {
     
     var uniqueIdentifier: UUID = UUID()
     
-    var cancellabel: Cancellabel?
+    var cancellable: Cancellable?
     var eventsSupport: [CoreLocationEventSupport] = [.didUpdateHeading, .didFailWithError]
     var stream: HeadingMonitorStream.Continuation?
     

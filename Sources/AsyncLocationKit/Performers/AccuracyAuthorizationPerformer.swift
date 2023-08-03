@@ -34,7 +34,7 @@ class RequestAccuracyAuthorizationPerformer: AnyLocationPerformer {
 
     var continuation: AccuracyAuthorizationContinuation?
 
-    weak var cancellabel: Cancellabel?
+    weak var cancellable: Cancellable?
 
     func linkContinuation(_ continuation: AccuracyAuthorizationContinuation) {
         self.continuation = continuation
@@ -47,10 +47,10 @@ class RequestAccuracyAuthorizationPerformer: AnyLocationPerformer {
     func invokedMethod(event: CoreLocationDelegateEvent) {
         switch event {
         case .didChangeAccuracyAuthorization(let authorization):
-            guard let continuation = continuation else { cancellabel?.cancel(for: self); return }
+            guard let continuation = continuation else { cancellable?.cancel(for: self); return }
             continuation.resume(returning: authorization)
             self.continuation = nil
-            cancellabel?.cancel(for: self)
+            cancellable?.cancel(for: self)
         default:
             fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
         }

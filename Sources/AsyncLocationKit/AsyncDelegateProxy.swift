@@ -24,7 +24,7 @@ import Foundation
 
 typealias CancelationCondition = ((AnyLocationPerformer) -> Bool)
 
-protocol Cancellabel: AnyObject {
+protocol Cancellable: AnyObject {
     /// # Performer can use CheckecContinuation
     /// # who can return value only **once**, and next attempt will lead to **crash** application
     /// ```swift
@@ -73,7 +73,7 @@ final class AsyncDelegateProxy: AsyncDelegateProxyInterface {
     }
     
     func addPerformer(_ performer: AnyLocationPerformer) {
-        performer.cancellabel = self
+        performer.cancellable = self
         performers.append(performer)
     }
     
@@ -101,7 +101,7 @@ final class AsyncDelegateProxy: AsyncDelegateProxyInterface {
     }
 }
 
-extension AsyncDelegateProxy: Cancellabel {
+extension AsyncDelegateProxy: Cancellable {
     func cancel(for performer: AnyLocationPerformer) {
         performers.removeAll(where: { $0.uniqueIdentifier == performer.uniqueIdentifier })
     }

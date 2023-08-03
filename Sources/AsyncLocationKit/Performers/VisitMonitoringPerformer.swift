@@ -37,7 +37,7 @@ class VisitMonitoringPerformer: AnyLocationPerformer {
     
     var uniqueIdentifier: UUID = UUID()
     
-    var cancellabel: Cancellabel?
+    var cancellable: Cancellable?
     var eventssupported: [CoreLocationEventSupport] = [.didVisit, .didFailWithError]
     var stream: VisitMonitoringStream.Continuation?
     

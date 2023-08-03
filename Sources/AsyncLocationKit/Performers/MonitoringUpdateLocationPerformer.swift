@@ -39,7 +39,7 @@ class MonitoringUpdateLocationPerformer: AnyLocationPerformer {
     
     var eventsSupport: [CoreLocationEventSupport] = [.didUpdateLocations, .locationUpdatesPaused, .locationUpdatesResume, .didFailWithError]
     
-    var cancellabel: Cancellabel?
+    var cancellable: Cancellable?
     var stream: LocationStream.Continuation?
     
     func linkContinuation(_ continuation: LocationStream.Continuation) {
