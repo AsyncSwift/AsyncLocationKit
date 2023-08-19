@@ -10,6 +10,11 @@ import CoreLocation
 
 class MockLocationManager: CLLocationManager {
     private var mockAllowsBackgroundLocationUpdates: Bool = false
+    private var _authStatus: CLAuthorizationStatus = .notDetermined
+    
+    override var authorizationStatus: CLAuthorizationStatus {
+        return _authStatus
+    }
     
     #if !os(tvOS)
     override var allowsBackgroundLocationUpdates: Bool {
@@ -28,5 +33,19 @@ class MockLocationManager: CLLocationManager {
     
     override func requestLocation() {
         delegate?.locationManager?(self, didUpdateLocations: [location!])
+    }
+    
+    override func requestAlwaysAuthorization() {
+        _authStatus = .authorizedAlways
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            self.delegate?.locationManagerDidChangeAuthorization?(self)
+        }
+    }
+    
+    override func requestWhenInUseAuthorization() {
+        _authStatus = .authorized
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            self.delegate?.locationManagerDidChangeAuthorization?(self)
+        }
     }
 }

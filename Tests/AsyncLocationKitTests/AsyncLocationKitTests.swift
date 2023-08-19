@@ -44,4 +44,11 @@ final class AsyncLocationKitTests: XCTestCase {
             XCTAssert(false, error.localizedDescription)
         }
     }
+    
+    func testRequestPermission() async throws {
+        let locationManager = AsyncLocationManager(locationManager: AsyncLocationKitTests.mockLocationManager)
+        let status = await locationManager.requestPermission(with: .whenInUsage)
+        
+        XCTAssertEqual(status, .authorized)
+    }
 }
