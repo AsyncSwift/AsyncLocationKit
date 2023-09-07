@@ -288,7 +288,7 @@ public final class AsyncLocationManager {
         return SignificantLocationChangeMonitoringStream { streamContinuation in
             monitoringPerformer.linkContinuation(streamContinuation)
             proxyDelegate.addPerformer(monitoringPerformer)
-            locationManager.startUpdatingLocation()
+            locationManager.startMonitoringSignificantLocationChanges()
             streamContinuation.onTermination = { @Sendable _ in
                 self.proxyDelegate.cancel(for: monitoringPerformer.uniqueIdentifier)
             }
@@ -298,7 +298,7 @@ public final class AsyncLocationManager {
     @available(watchOS, unavailable)
     @available(tvOS, unavailable)
     public func stopMonitoringSignificantLocationChanges() {
-        locationManager.stopUpdatingLocation()
+        locationManager.stopMonitoringSignificantLocationChanges()
         proxyDelegate.cancel(for: SignificantLocationChangeMonitoringPerformer.self)
     }
     
