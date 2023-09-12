@@ -30,6 +30,7 @@ public typealias LocationEnabledStream = AsyncStream<LocationEnabledEvent>
 public typealias LocationStream = AsyncStream<LocationUpdateEvent>
 public typealias RegionMonitoringStream = AsyncStream<RegionMonitoringEvent>
 public typealias VisitMonitoringStream = AsyncStream<VisitMonitoringEvent>
+public typealias SignificantLocationChangeMonitoringStream = AsyncStream<SignificantLocationChangeEvent>
 public typealias HeadingMonitorStream = AsyncStream<HeadingMonitorEvent>
 public typealias AuthorizationStream = AsyncStream<AuthorizationEvent>
 public typealias AccuracyAuthorizationStream = AsyncStream<AccuracyAuthorizationEvent>
@@ -278,6 +279,27 @@ public final class AsyncLocationManager {
     public func stopMonitoringVisit() {
         proxyDelegate.cancel(for: VisitMonitoringPerformer.self)
         locationManager.stopMonitoringVisits()
+    }
+    
+    @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
+    public func startMonitoringSignificantLocationChanges() async -> SignificantLocationChangeMonitoringStream {
+        let monitoringPerformer = SignificantLocationChangeMonitoringPerformer()
+        return SignificantLocationChangeMonitoringStream { streamContinuation in
+            monitoringPerformer.linkContinuation(streamContinuation)
+            proxyDelegate.addPerformer(monitoringPerformer)
+            locationManager.startMonitoringSignificantLocationChanges()
+            streamContinuation.onTermination = { @Sendable _ in
+                self.proxyDelegate.cancel(for: monitoringPerformer.uniqueIdentifier)
+            }
+        }
+    }
+    
+    @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
+    public func stopMonitoringSignificantLocationChanges() {
+        locationManager.stopMonitoringSignificantLocationChanges()
+        proxyDelegate.cancel(for: SignificantLocationChangeMonitoringPerformer.self)
     }
     
 #if os(iOS)
