@@ -438,7 +438,7 @@ extension CLAuthorizationStatus: CustomStringConvertible {
         case .restricted: return ".restricted"
         case .denied: return ".denied"
         case .authorizedWhenInUse: return ".authorizedWhenInUse"
-        case .authorizedAlways: return ".authorisedAlways"
+        case .authorizedAlways: return ".authorizedAlways"
         @unknown default: return "unknown \(rawValue)"
         }
     }
