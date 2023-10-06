@@ -4,7 +4,7 @@
 [![Swift](https://img.shields.io/badge/Swift-5.5-orange?style=flat)](https://img.shields.io/badge/Swift-5.5-Orange?style=flat)
 [![Platforms](https://img.shields.io/badge/platforms-iOS--13%20|%20macOS(beta)%20|%20watchOS--6(beta)%20|%20tvOS(beta)-orange?style=flat)](https://img.shields.io/badge/platforms-iOS--13%20|%20macOS(beta)%20|%20watchOS--6(beta)%20|%20tvOS(beta)-orange?style=flat)
 
-Wrapper for Apple `CoreLocation` framework with new Concurency Model. No more `delegate` pattern or `completion blocks`.
+Wrapper for Apple `CoreLocation` framework with new Concurrency Model. No more `delegate` pattern or `completion blocks`.
 
 ### Install
 ---
@@ -52,4 +52,4 @@ for await locationUpdateEvent in await asyncLocationManager.startUpdatingLocatio
 }
 ```
 
-If `Task` was canceled, Stream finished automaticaly.
+If `Task` was cancelled, Stream finished automaticaly.
