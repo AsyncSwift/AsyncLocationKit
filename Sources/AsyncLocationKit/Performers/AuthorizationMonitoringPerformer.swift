@@ -21,9 +21,9 @@
 //  SOFTWARE.
 
 import Foundation
-import CoreLocation
+@preconcurrency import CoreLocation
 
-public enum AuthorizationEvent {
+public enum AuthorizationEvent: Sendable {
     case didUpdate(authorization: CLAuthorizationStatus)
 }
 
@@ -51,7 +51,7 @@ class AuthorizationMonitoringPerformer: AnyLocationPerformer {
         case .didChangeAuthorization(let authorization):
             stream?.yield(.didUpdate(authorization: authorization))
         default:
-            fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
+            assertionFailure("Unsupported event received by \(String(describing: self)): \(event)")
         }
     }
 

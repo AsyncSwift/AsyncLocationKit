@@ -21,7 +21,7 @@
 //  SOFTWARE.
 
 import Foundation
-import CoreLocation
+@preconcurrency import CoreLocation
 
 class RequestAccuracyAuthorizationPerformer: AnyLocationPerformer {
     var typeIdentifier: ObjectIdentifier {
@@ -52,7 +52,7 @@ class RequestAccuracyAuthorizationPerformer: AnyLocationPerformer {
             self.continuation = nil
             cancellable?.cancel(for: self)
         default:
-            fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
+            assertionFailure("Unsupported event received by \(String(describing: self)): \(event)")
         }
     }
 

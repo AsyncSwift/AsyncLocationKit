@@ -21,11 +21,11 @@
 //  SOFTWARE.
 
 import Foundation
-import CoreLocation
+@preconcurrency import CoreLocation
 
 @available(watchOS, unavailable)
 @available(tvOS, unavailable)
-public enum BeaconRangeEvent {
+public enum BeaconRangeEvent: Sendable {
     case didRange(beacons: [CLBeacon], beaconConstraint: CLBeaconIdentityConstraint)
     case didFailRanginFor(beaconConstraint: CLBeaconIdentityConstraint, error: Error)
 }
@@ -40,7 +40,7 @@ class BeaconsRangePerformer: AnyLocationPerformer {
     
     var cancellable: Cancellable?
     
-    var eventssupported: [CoreLocationEventSupport] = [.didRangeBeacons, .didFailRanginForBeaconConstraint]
+    var eventsSupport: [CoreLocationEventSupport] = [.didRangeBeacons, .didFailRanginForBeaconConstraint]
     
     @available(watchOS, unavailable)
     @available(tvOS, unavailable)
@@ -63,7 +63,7 @@ class BeaconsRangePerformer: AnyLocationPerformer {
     }
     
     func eventSupported(_ event: CoreLocationDelegateEvent) -> Bool {
-        return eventssupported.contains(event.rawEvent())
+        return eventsSupport.contains(event.rawEvent())
     }
     
     func invokedMethod(event: CoreLocationDelegateEvent) {
@@ -75,7 +75,7 @@ class BeaconsRangePerformer: AnyLocationPerformer {
             stream?.yield(.didFailRanginFor(beaconConstraint: beaconConstraint, error: error))
         #endif
         default:
-            fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
+            assertionFailure("Unsupported event received by \(String(describing: self)): \(event)")
         }
     }
     

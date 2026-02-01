@@ -21,9 +21,9 @@
 //  SOFTWARE.
 
 import Foundation
-import CoreLocation
+@preconcurrency import CoreLocation
 
-public enum LocationEnabledEvent {
+public enum LocationEnabledEvent: Sendable {
     case didUpdate(enabled: Bool)
 }
 
@@ -51,7 +51,7 @@ class LocationEnabledMonitoringPerformer: AnyLocationPerformer {
         case .didChangeLocationEnabled(let enabled):
             stream?.yield(.didUpdate(enabled: enabled))
         default:
-            fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
+            assertionFailure("Unsupported event received by \(String(describing: self)): \(event)")
         }
     }
 

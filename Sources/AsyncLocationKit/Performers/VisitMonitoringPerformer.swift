@@ -21,9 +21,9 @@
 //  SOFTWARE.
 
 import Foundation
-import CoreLocation.CLVisit
+@preconcurrency import CoreLocation.CLVisit
 
-public enum VisitMonitoringEvent {
+public enum VisitMonitoringEvent: Sendable {
     @available(watchOS, unavailable)
     @available(tvOS, unavailable)
     case didVisit(visit: CLVisit)
@@ -38,7 +38,7 @@ class VisitMonitoringPerformer: AnyLocationPerformer {
     var uniqueIdentifier: UUID = UUID()
     
     var cancellable: Cancellable?
-    var eventssupported: [CoreLocationEventSupport] = [.didVisit, .didFailWithError]
+    var eventsSupport: [CoreLocationEventSupport] = [.didVisit, .didFailWithError]
     var stream: VisitMonitoringStream.Continuation?
     
     func linkContinuation(_ continuation: VisitMonitoringStream.Continuation) {
@@ -46,7 +46,7 @@ class VisitMonitoringPerformer: AnyLocationPerformer {
     }
     
     func eventSupported(_ event: CoreLocationDelegateEvent) -> Bool {
-        return eventssupported.contains(event.rawEvent())
+        return eventsSupport.contains(event.rawEvent())
     }
     
     func invokedMethod(event: CoreLocationDelegateEvent) {
@@ -58,7 +58,7 @@ class VisitMonitoringPerformer: AnyLocationPerformer {
             stream?.yield(.didVisit(visit: visit))
             #endif
         default:
-            fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
+            assertionFailure("Unsupported event received by \(String(describing: self)): \(event)")
         }
     }
     

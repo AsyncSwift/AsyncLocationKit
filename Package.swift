@@ -27,5 +27,5 @@ let package = Package(
             dependencies: ["AsyncLocationKit"]),
     ],
     
-    swiftLanguageVersions: [.version("5.5")]
+    swiftLanguageVersions: [.v5]
 )

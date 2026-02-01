@@ -21,9 +21,9 @@
 //  SOFTWARE.
 
 import Foundation
-import CoreLocation
+@preconcurrency import CoreLocation
 
-public enum AccuracyAuthorizationEvent {
+public enum AccuracyAuthorizationEvent: Sendable {
     case didUpdate(accuracyAuthorization: CLAccuracyAuthorization)
 }
 
@@ -51,7 +51,7 @@ class AccuracyAuthorizationMonitoringPerformer: AnyLocationPerformer {
         case .didChangeAccuracyAuthorization(let accuracyAuthorization):
             stream?.yield(.didUpdate(accuracyAuthorization: accuracyAuthorization))
         default:
-            fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
+            assertionFailure("Unsupported event received by \(String(describing: self)): \(event)")
         }
     }
 

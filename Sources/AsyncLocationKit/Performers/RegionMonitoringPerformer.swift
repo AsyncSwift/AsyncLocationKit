@@ -21,9 +21,9 @@
 //  SOFTWARE.
 
 import Foundation
-import CoreLocation.CLRegion
+@preconcurrency import CoreLocation.CLRegion
 
-public enum RegionMonitoringEvent {
+public enum RegionMonitoringEvent: Sendable {
     case didEnterTo(region: CLRegion)
     case didExitTo(region: CLRegion)
     case didStartMonitoringFor(region: CLRegion)
@@ -65,7 +65,7 @@ class RegionMonitoringPerformer: AnyLocationPerformer {
         case .monitoringDidFailFor(let region, let error):
             stream?.yield(.monitoringDidFailFor(region: region, error: error))
         default:
-            fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
+            assertionFailure("Unsupported event received by \(String(describing: self)): \(event)")
         }
     }
     

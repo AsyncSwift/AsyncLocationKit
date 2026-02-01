@@ -60,49 +60,64 @@ protocol AsyncDelegateProxyInterface: AnyObject {
 
 final class AsyncDelegateProxy: AsyncDelegateProxyInterface {
     /// Array of performers, who handle events from normal delegate
-    var performers: [AnyLocationPerformer] = []
-    
+    private var performers: [AnyLocationPerformer] = []
+
+    /// Serial queue for thread-safe access to performers array
+    private let performersQueue = DispatchQueue(label: "com.asynclocationkit.performers", qos: .userInitiated)
+
     /// Handle method from delegate converted to **enum** case
     /// - Parameter event: case converting from method of normal delegate
     func eventForMethodInvoked(_ event: CoreLocationDelegateEvent) {
-        for performer in performers {
-            if performer.eventSupported(event) {
-                performer.invokedMethod(event: event)
+        performersQueue.sync {
+            for performer in performers {
+                if performer.eventSupported(event) {
+                    performer.invokedMethod(event: event)
+                }
             }
         }
     }
-    
+
     func addPerformer(_ performer: AnyLocationPerformer) {
-        performer.cancellable = self
-        performers.append(performer)
+        performersQueue.sync {
+            performer.cancellable = self
+            performers.append(performer)
+        }
     }
-    
+
     func cancel(for type: AnyLocationPerformer.Type) {
-        performers.removeAll(where: { $0.typeIdentifier == ObjectIdentifier(type) })
+        performersQueue.sync {
+            performers.removeAll(where: { $0.typeIdentifier == ObjectIdentifier(type) })
+        }
     }
-    
+
     func cancel(for uniqueIdentifier: UUID) {
-        performers.removeAll { performer in
-            if performer.uniqueIdentifier == uniqueIdentifier {
-                performer.cancelation()
-                return true
-            } else {
-                return false
+        performersQueue.sync {
+            performers.removeAll { performer in
+                if performer.uniqueIdentifier == uniqueIdentifier {
+                    performer.cancelation()
+                    return true
+                } else {
+                    return false
+                }
             }
         }
     }
-    
+
     func cancel(for type: AnyLocationPerformer.Type, with condition: @escaping (AnyLocationPerformer) -> Bool) {
-        var filteredPerformer = performers.allWith(identifier: ObjectIdentifier(type))
-        filteredPerformer.removeAll(where: { condition($0) })
-        filteredPerformer.forEach { _performer in
-            performers.removeAll(where: { $0.uniqueIdentifier == _performer.uniqueIdentifier })
+        performersQueue.sync {
+            var filteredPerformer = performers.allWith(identifier: ObjectIdentifier(type))
+            filteredPerformer.removeAll(where: { condition($0) })
+            filteredPerformer.forEach { _performer in
+                performers.removeAll(where: { $0.uniqueIdentifier == _performer.uniqueIdentifier })
+            }
         }
     }
 }
 
 extension AsyncDelegateProxy: Cancellable {
     func cancel(for performer: AnyLocationPerformer) {
-        performers.removeAll(where: { $0.uniqueIdentifier == performer.uniqueIdentifier })
+        performersQueue.sync {
+            performers.removeAll(where: { $0.uniqueIdentifier == performer.uniqueIdentifier })
+        }
     }
 }
