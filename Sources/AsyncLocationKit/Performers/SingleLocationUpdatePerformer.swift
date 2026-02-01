@@ -21,7 +21,7 @@
 //  SOFTWARE.
 
 import Foundation
-import CoreLocation.CLLocation
+@preconcurrency import CoreLocation.CLLocation
 
 class SingleLocationUpdatePerformer: AnyLocationPerformer {
     var typeIdentifier: ObjectIdentifier {
@@ -54,7 +54,7 @@ class SingleLocationUpdatePerformer: AnyLocationPerformer {
             continuation = nil
             cancellable?.cancel(for: self)
         default:
-            fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
+            assertionFailure("Unsupported event received by \(String(describing: self)): \(event)")
         }
     }
     

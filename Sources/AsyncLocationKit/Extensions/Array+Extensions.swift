@@ -22,8 +22,11 @@
 
 import Foundation
 
-//MARK: - Array extension equal to filter, but shortly 🙂
+// MARK: - Array extension for filtering performers by type identifier
 extension Array where Element == AnyLocationPerformer {
+    /// Returns all performers matching the specified type identifier
+    /// - Parameter identifier: The ObjectIdentifier to filter by
+    /// - Returns: Array of performers matching the identifier
     func allWith(identifier: ObjectIdentifier) -> [Element] {
         return self.filter({ $0.typeIdentifier == identifier })
     }

@@ -21,7 +21,7 @@
 //  SOFTWARE.
 
 import Foundation
-import CoreLocation.CLLocation
+@preconcurrency import CoreLocation.CLLocation
 
 class RequestAuthorizationPerformer: AnyLocationPerformer {
     private let currentStatus: CLAuthorizationStatus
@@ -39,11 +39,11 @@ class RequestAuthorizationPerformer: AnyLocationPerformer {
     
     var eventsSupport: [CoreLocationEventSupport] = [.didChangeAuthorization]
     
-    var continuation: AuthotizationContinuation?
+    var continuation: AuthorizationContinuation?
     
     weak var cancellable: Cancellable?
     
-    func linkContinuation(_ continuation: AuthotizationContinuation) {
+    func linkContinuation(_ continuation: AuthorizationContinuation) {
         self.continuation = continuation
         Task { await start() }
     }
@@ -88,7 +88,7 @@ class RequestAuthorizationPerformer: AnyLocationPerformer {
                 }
             }
         default:
-            fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
+            assertionFailure("Unsupported event received by \(String(describing: self)): \(event)")
         }
     }
 

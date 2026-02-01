@@ -21,9 +21,9 @@
 //  SOFTWARE.
 
 import Foundation
-import CoreLocation.CLHeading
+@preconcurrency import CoreLocation.CLHeading
 
-public enum HeadingMonitorEvent {
+public enum HeadingMonitorEvent: Sendable {
     @available(tvOS, unavailable)
     case didUpdate(heading: CLHeading)
     case didFailWith(error: Error)
@@ -57,7 +57,7 @@ class HeadingMonitorPerformer: AnyLocationPerformer {
         case .didFailWithError(let error):
             stream?.yield(.didFailWith(error: error))
         default:
-            fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
+            assertionFailure("Unsupported event received by \(String(describing: self)): \(event)")
         }
     }
     

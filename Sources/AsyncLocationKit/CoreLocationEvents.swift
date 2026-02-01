@@ -21,8 +21,8 @@
 //  SOFTWARE.
 
 import Foundation
-import CoreLocation.CLLocationManagerDelegate
-import CoreLocation
+@preconcurrency import CoreLocation.CLLocationManagerDelegate
+@preconcurrency import CoreLocation
 
 enum CoreLocationDelegateEvent {
 //    MARK: - Authorization event

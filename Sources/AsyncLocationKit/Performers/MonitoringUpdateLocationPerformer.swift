@@ -21,9 +21,9 @@
 //  SOFTWARE.
 
 import Foundation
-import CoreLocation.CLLocation
+@preconcurrency import CoreLocation.CLLocation
 
-public enum LocationUpdateEvent {
+public enum LocationUpdateEvent: Sendable {
     case didPaused
     case didResume
     case didUpdateLocations(locations: [CLLocation])
@@ -61,7 +61,7 @@ class MonitoringUpdateLocationPerformer: AnyLocationPerformer {
         case .didFailWithError(let error):
             stream?.yield(.didFailWith(error: error))
         default:
-            fatalError("Method can't be execute by this performer: \(String(describing: self)) for event: \(type(of: event))")
+            assertionFailure("Unsupported event received by \(String(describing: self)): \(event)")
         }
     }
     

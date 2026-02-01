@@ -21,15 +21,51 @@
 //  SOFTWARE.
 
 import Foundation
-import CoreLocation
+@preconcurrency import CoreLocation
 
-/// Wrapper for CLLocationAccuracy
-public enum LocationAccuracy {
+/// Represents the desired accuracy of location data.
+///
+/// Use this enum to specify how accurate you need location data to be.
+/// Higher accuracy consumes more battery power.
+///
+/// ## Examples
+/// ```swift
+/// // For navigation apps
+/// let manager = AsyncLocationManager(desiredAccuracy: .bestForNavigationAccuracy)
+///
+/// // For general location (saves battery)
+/// let manager = AsyncLocationManager(desiredAccuracy: .hundredMetersAccuracy)
+/// ```
+public enum LocationAccuracy: Sendable {
+    /// The highest level of accuracy available.
+    ///
+    /// Uses all available positioning methods (GPS, WiFi, cellular) for maximum precision.
+    /// Consumes the most battery power.
     case bestAccuracy
+
+    /// Accurate to within ten meters.
+    ///
+    /// Good balance between accuracy and battery usage for most apps.
     case nearestTenMetersAccuracy
+
+    /// Accurate to within one hundred meters.
+    ///
+    /// Suitable for apps that don't need precise location. Uses less battery.
     case hundredMetersAccuracy
+
+    /// Accurate to within one kilometer.
+    ///
+    /// Suitable for weather apps or other apps with low precision requirements.
     case kilometerAccuracy
+
+    /// Accurate to within three kilometers.
+    ///
+    /// The lowest accuracy level. Minimal battery impact.
     case threeKilometersAccuracy
+
+    /// The highest accuracy available, optimized for navigation.
+    ///
+    /// Similar to `bestAccuracy` but may use additional sensor data for navigation.
     case bestForNavigationAccuracy
     
     internal var convertingAccuracy: CLLocationAccuracy {

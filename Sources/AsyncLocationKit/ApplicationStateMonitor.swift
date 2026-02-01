@@ -75,23 +75,11 @@ class ApplicationStateMonitor {
 
     @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     private var hasResignedActiveSequence: AsyncMapSequence<NotificationCenter.Notifications, Bool> {
-        _hasResignedActiveSequence as! AsyncMapSequence<NotificationCenter.Notifications, Bool>
+        NotificationCenter.default.notifications(named: NotificationNamesConstants.willResignActiveName).map { _ in true }
     }
 
     @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     private var hasBecomeActiveSequence: AsyncMapSequence<NotificationCenter.Notifications, Bool> {
-        _hasBecomeActiveSequence as! AsyncMapSequence<NotificationCenter.Notifications, Bool>
+        NotificationCenter.default.notifications(named: NotificationNamesConstants.didBecomeActiveName).map { _ in true }
     }
-
-    // We unfortunately need these backing variables since properties cannot be declared conditionally available
-
-    private var _hasResignedActiveSequence: Any? = {
-        guard #available(macOS 12, iOS 15, tvOS 15, watchOS 8, *) else { return nil }
-        return NotificationCenter.default.notifications(named: NotificationNamesConstants.willResignActiveName).map { _ in true }
-    }()
-
-    private var _hasBecomeActiveSequence: Any? = {
-        guard #available(macOS 12, iOS 15, tvOS 15, watchOS 8, *) else { return nil }
-        return NotificationCenter.default.notifications(named: NotificationNamesConstants.didBecomeActiveName).map { _ in true }
-    }()
 }
