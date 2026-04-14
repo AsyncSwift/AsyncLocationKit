@@ -38,21 +38,21 @@ Add AsyncLocationKit to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/AsyncSwift/AsyncLocationKit.git", from: "2.0.0")
+    .package(url: "https://github.com/AsyncSwift/AsyncLocationKit.git", from: "2.0.1")
 ]
 ```
 
 Or add it directly in Xcode:
 1. File → Add Package Dependencies
 2. Enter: `https://github.com/AsyncSwift/AsyncLocationKit.git`
-3. Select version `2.0.0` or later
+3. Select version `2.0.1` or later
 
 ### CocoaPods
 
 Add to your `Podfile`:
 
 ```ruby
-pod 'AsyncLocationKit', :git => 'https://github.com/AsyncSwift/AsyncLocationKit.git', :tag => '2.0.0'
+pod 'AsyncLocationKit', :git => 'https://github.com/AsyncSwift/AsyncLocationKit.git', :tag => '2.0.1'
 ```
 
 Then run:
