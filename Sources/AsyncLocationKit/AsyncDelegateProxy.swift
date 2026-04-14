@@ -68,11 +68,11 @@ final class AsyncDelegateProxy: AsyncDelegateProxyInterface {
     /// Handle method from delegate converted to **enum** case
     /// - Parameter event: case converting from method of normal delegate
     func eventForMethodInvoked(_ event: CoreLocationDelegateEvent) {
-        performersQueue.sync {
-            for performer in performers {
-                if performer.eventSupported(event) {
-                    performer.invokedMethod(event: event)
-                }
+        let currentPerformers = performersQueue.sync { performers }
+
+        for performer in currentPerformers {
+            if performer.eventSupported(event) {
+                performer.invokedMethod(event: event)
             }
         }
     }
