@@ -51,4 +51,40 @@ final class AsyncLocationKitTests: XCTestCase {
         
         XCTAssertEqual(status, .authorized)
     }
+
+    func testConditionalCancellationRemovesOnlyMatchingPerformer() {
+        let proxy = AsyncDelegateProxy()
+        let matchingPerformer = CancellationTestPerformer()
+        let otherPerformer = CancellationTestPerformer()
+        proxy.addPerformer(matchingPerformer)
+        proxy.addPerformer(otherPerformer)
+
+        proxy.cancel(for: CancellationTestPerformer.self) {
+            $0.uniqueIdentifier == matchingPerformer.uniqueIdentifier
+        }
+        proxy.eventForMethodInvoked(.didChangeLocationEnabled(enabled: true))
+
+        XCTAssertEqual(matchingPerformer.eventCount, 0)
+        XCTAssertEqual(otherPerformer.eventCount, 1)
+    }
+}
+
+private final class CancellationTestPerformer: AnyLocationPerformer {
+    let uniqueIdentifier = UUID()
+    var cancellable: Cancellable?
+    private(set) var eventCount = 0
+
+    var typeIdentifier: ObjectIdentifier {
+        ObjectIdentifier(Self.self)
+    }
+
+    func eventSupported(_ event: CoreLocationDelegateEvent) -> Bool {
+        true
+    }
+
+    func invokedMethod(event: CoreLocationDelegateEvent) {
+        eventCount += 1
+    }
+
+    func cancelation() {}
 }

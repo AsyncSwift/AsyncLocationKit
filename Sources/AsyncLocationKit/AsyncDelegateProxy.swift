@@ -105,10 +105,11 @@ final class AsyncDelegateProxy: AsyncDelegateProxyInterface {
 
     func cancel(for type: AnyLocationPerformer.Type, with condition: @escaping (AnyLocationPerformer) -> Bool) {
         performersQueue.sync {
-            var filteredPerformer = performers.allWith(identifier: ObjectIdentifier(type))
-            filteredPerformer.removeAll(where: { condition($0) })
-            filteredPerformer.forEach { _performer in
-                performers.removeAll(where: { $0.uniqueIdentifier == _performer.uniqueIdentifier })
+            let performersToCancel = performers
+                .allWith(identifier: ObjectIdentifier(type))
+                .filter(condition)
+            performersToCancel.forEach { performer in
+                performers.removeAll(where: { $0.uniqueIdentifier == performer.uniqueIdentifier })
             }
         }
     }
